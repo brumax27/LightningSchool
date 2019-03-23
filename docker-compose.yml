@@ -1,26 +1,18 @@
-version: '3.6'
+version: '3.1'
 
 services:
 
-  mongo:
-    image: mongo
+  mysql:
+    image: mysql:5.7.25
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
-      - ./db/mongo/data:/data/db
-    ports:
-      - 27017:27017
+      - ./db/mysql/data:/var/lib/mysql
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-
-  mongo-express:
-    image: mongo-express
-    restart: always
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: lightning_school
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      - 3306:3306
 
   neo4j:
     image: neo4j:3.5
