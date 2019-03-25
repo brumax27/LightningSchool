@@ -24,4 +24,4 @@ services:
       - ./db/neo4j/logs:/logs
     ports:
       - 7474:7474
-      - 76877:7687
+      - 17687:7687
