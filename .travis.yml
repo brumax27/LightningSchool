@@ -13,3 +13,9 @@ script: "./mvnw --show-version --errors --batch-mode clean install"
 cache:
   directories:
   - $HOME/.m2
+
+before_install:
+  - "docker-compose up"
+
+services:
+  - docker
