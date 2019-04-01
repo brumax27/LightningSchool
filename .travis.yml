@@ -27,3 +27,7 @@ after_success:
 after_failure:
   - chmod +x send.sh
   - ./send.sh failure $WEBHOOK_URL
+
+after_error:
+  - chmod +x send.sh
+  - ./send.sh error $WEBHOOK_URL
