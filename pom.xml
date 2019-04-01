@@ -15,7 +15,7 @@
     <description>Lightning School</description>
 
     <properties>
-        <java.versionmm>1.8</java.versionmm>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
@@ -26,7 +26,7 @@
         <!--https://neo4j.com/developer/-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+            <artifactId>spring-boot-starter-data----neo4j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
