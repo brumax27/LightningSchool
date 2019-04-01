@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LightningschoolWebappApplication {
 
     public static void main(String[] args) {
-        SpringApplication..run.run(LightningschoolWebappApplication.class, args);
+        SpringApplication.run(LightningschoolWebappApplication.class, args);
     }
 
 }
