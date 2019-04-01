@@ -4,6 +4,7 @@ jdk: oraclejdk8
 
 env:
   - MAVEN_VERSION=3.3.9
+  - WEBHOOK_URL=https://discordapp.com/api/webhooks/562261833143025664/1lYVssTL5bXdSvf9BS9UlGb3_FPdeHKJKeOA42zhXIJ7gZ2jWVG4ilSNg6tT9cv2N9R_
 
 install:
   - "mvn -N io.takari:maven:wrapper -Dmaven=${MAVEN_VERSION}"
@@ -19,3 +20,13 @@ before_install:
 
 services:
   - docker
+
+after_success:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
