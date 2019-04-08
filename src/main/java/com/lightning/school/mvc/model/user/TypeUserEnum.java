@@ -1,4 +1,4 @@
-package com.lightning.school.mvc.model;
+package com.lightning.school.mvc.model.user;
 
 import java.util.Arrays;
 
