@@ -1,7 +1,6 @@
 package com.lightning.school.mvc.model;
 
 import com.lightning.school.mvc.model.exercice.Exercice;
-import com.lightning.school.mvc.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,19 +23,18 @@ public class Cours implements Serializable {
     private Integer coursId;
     @Column(name = "LIBELLE_COURS")
     private String coursLabel;
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DEADLINE")
     private LocalDateTime deadline;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
-    private List<Class> classes;
+    @ManyToMany
+    private List<Section> sections;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Page> pages;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Exercice> exercices;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Media> medias;
 }

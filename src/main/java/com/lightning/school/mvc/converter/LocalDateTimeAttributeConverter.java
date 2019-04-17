@@ -3,19 +3,20 @@ package com.lightning.school.mvc.converter;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Converter(autoApply = true)
-public class LocalDateTimeAttributeConverter implements AttributeConverter<LocalDateTime, Timestamp> {
+public class LocalDateTimeAttributeConverter implements AttributeConverter<LocalDateTime, Date> {
 
     @Override
-    public Timestamp convertToDatabaseColumn(LocalDateTime locDateTime) {
-        return locDateTime == null ? null : Timestamp.valueOf(locDateTime);
+    public Date convertToDatabaseColumn(LocalDateTime locDateTime) {
+        return locDateTime == null ? null : Date.from(locDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     @Override
-    public LocalDateTime convertToEntityAttribute(Timestamp sqlTimestamp) {
-        return sqlTimestamp == null ? null : sqlTimestamp.toLocalDateTime();
+    public LocalDateTime convertToEntityAttribute(Date sqlTimestamp) {
+        return sqlTimestamp == null ? null : LocalDateTime.from(sqlTimestamp.toInstant());
     }
 }

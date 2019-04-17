@@ -24,6 +24,6 @@ public class Media implements Serializable {
     @Column(name = "PATH")
     private String path;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Cours> cours;
 }

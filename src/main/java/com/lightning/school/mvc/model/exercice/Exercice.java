@@ -29,7 +29,7 @@ public class Exercice implements Serializable {
     @Column(name = "COEFFICIENT")
     private Float coeficient;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Cours> cours;
 
     public ExerciceTypeEnum getExerciceType(){

@@ -1,7 +1,7 @@
 package com.lightning.school.mvc.model.user;
 
-import com.lightning.school.mvc.model.Class;
 import com.lightning.school.mvc.model.Group;
+import com.lightning.school.mvc.model.Section;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,14 +31,14 @@ public class User implements Serializable {
     @Column(name = "PHOTO_PATH")
     private String userPhoto;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
-    private List<Class> classes;
+    @ManyToMany
+    private List<Section> sections;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Group> groups;
 
-    public TypeUserEnum getUserType(){
-        return TypeUserEnum.retrieveTypeUserByValue(this.typeUserId);
+    public UserTypeEnum getUserType(){
+        return UserTypeEnum.retrieveTypeUserByValue(this.typeUserId);
     }
 
 }

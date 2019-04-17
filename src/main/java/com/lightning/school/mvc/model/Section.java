@@ -13,21 +13,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "CLASS")
-public class Class implements Serializable {
+@Table(name = "SECTION")
+public class Section implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name = "ID_CLASS", nullable = false)
-    private Integer classId;
-    @Column(name = "LIBELLE_CLASS")
-    private String labelClass;
+    @Column(name = "ID_SECTION", nullable = false)
+    private Integer sectionId;
+    @Column(name = "LIBELLE_SECTION")
+    private String sectionLabel;
     @Column(name = "YEAR_PROMOTION")
     private Integer promotionYear;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     private List<User> users;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     private List<Cours> groups;
 }

@@ -23,7 +23,7 @@ public class Group implements Serializable {
     @Column(name = "LIBELLE_GROUP")
     private String groupLabel;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<User> users;
 
 }

@@ -1,6 +1,5 @@
 package com.lightning.school.mvc.model;
 
-import com.lightning.school.mvc.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,7 @@ public class Page implements Serializable {
     @Column(name = "CONTENU_PAGE")
     private String pageContent;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @ManyToMany
     List<Cours> cours;
 
 }
