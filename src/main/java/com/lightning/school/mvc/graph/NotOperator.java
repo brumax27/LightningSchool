@@ -1,6 +1,6 @@
 package com.lightning.school.mvc.graph;
 
-import com.lightning.school.mvc.graph.exception.MethodBooleanExecption;
+import com.lightning.school.mvc.graph.exception.MethodBooleanException;
 import lombok.*;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -27,7 +27,7 @@ public class NotOperator implements BooleanOperator{
     @Deprecated
     @Override
     public final boolean operation(boolean a, boolean b){
-        throw new MethodBooleanExecption("no usable method, use method 'boolean operation(boolean a)' !!!");
+        throw new MethodBooleanException("no usable method, use method 'boolean operation(boolean a)' !!!");
     }
 
     public final boolean operation(boolean a){
