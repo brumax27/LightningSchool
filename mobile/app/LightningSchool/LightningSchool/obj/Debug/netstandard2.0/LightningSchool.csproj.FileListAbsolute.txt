@@ -1,0 +1,13 @@
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/bin/Debug/netstandard2.0/LightningSchool.deps.json
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/bin/Debug/netstandard2.0/LightningSchool.dll
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/bin/Debug/netstandard2.0/LightningSchool.pdb
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LightningSchool.csprojAssemblyReference.cache
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LoginPage.xaml.g.cs
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/MainPage.xaml.g.cs
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/SignUpPage.xaml.g.cs
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LightningSchool.csproj.CoreCompileInputs.cache
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LightningSchool.AssemblyInfoInputs.cache
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LightningSchool.AssemblyInfo.cs
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/XamlC.stamp
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LightningSchool.dll
+/Users/rsoetewey/Documents/GitHub/LightningSchool/mobile/app/LightningSchool/LightningSchool/obj/Debug/netstandard2.0/LightningSchool.pdb
