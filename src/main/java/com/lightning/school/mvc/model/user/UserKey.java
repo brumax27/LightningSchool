@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
 import java.io.Serializable;
 
 @Data
@@ -16,9 +15,8 @@ import java.io.Serializable;
 @Embeddable
 public class UserKey implements Serializable {
 
-    @GeneratedValue
-    @Column(name = "USER_ID", nullable = false)
-    private Integer userId;
+    @Column(name = "USER_ID")
+    private String userId;
 
     @Column(name = "MAIL", nullable = false)
     private String mail;

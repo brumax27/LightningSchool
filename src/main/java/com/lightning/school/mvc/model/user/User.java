@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -36,6 +37,13 @@ public class User implements Serializable {
 
     @ManyToMany
     List<Group> groups;
+
+    public User(String email, String password){
+        this.password = password;
+        this.userKey = new UserKey();
+        this.userKey.setMail(email);
+        this.userKey.setUserId(UUID.randomUUID().toString());
+    }
 
     public UserTypeEnum getUserType(){
         return UserTypeEnum.retrieveTypeUserByValue(this.typeUserId);
