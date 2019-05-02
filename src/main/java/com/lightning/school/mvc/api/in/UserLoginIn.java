@@ -15,10 +15,4 @@ public class UserLoginIn {
     private String mail;
     private String password;
 
-    public boolean passwordIsValid(){
-        boolean ok = this.password.length() >= 8;
-        ok &= this.password.matches("[a-zA-Z0-9]*");
-        return ok;
-    }
-
 }

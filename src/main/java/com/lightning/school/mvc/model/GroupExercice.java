@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "GroupExercice")
 @Table(name = "GROUP_EXERCICE")
 public class GroupExercice implements Serializable {
 

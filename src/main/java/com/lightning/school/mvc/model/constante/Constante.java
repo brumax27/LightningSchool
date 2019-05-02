@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Constante")
 @Table(name = "CONSTANTE")
 public class Constante implements Serializable {
 

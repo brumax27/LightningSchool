@@ -13,8 +13,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "PAGE")
+@Entity(name = "UserExercice")
+@Table(name = "USER_EXERCICE")
 public class UserExercice implements Serializable {
 
     @EmbeddedId

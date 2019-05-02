@@ -12,18 +12,19 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Group")
 @Table(name = "GROUP")
 public class Group implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name = "ID_GROUP", nullable = false)
+    @Column(name = "ID_GROUP")
     private Integer groupId;
     @Column(name = "LIBELLE_GROUP")
     private String groupLabel;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_users", updatable = false, insertable = false)
     List<User> users;
 
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Cours")
 @Table(name = "COURS")
 public class Cours implements Serializable {
 
@@ -26,15 +26,19 @@ public class Cours implements Serializable {
     @Column(name = "DEADLINE")
     private LocalDateTime deadline;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cours_sections", updatable = false, insertable = false)
     private List<Section> sections;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cours_pages", updatable = false, insertable = false)
     List<Page> pages;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cours_exercices", updatable = false, insertable = false)
     List<Exercice> exercices;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cours_medias", updatable = false, insertable = false)
     List<Media> medias;
 }

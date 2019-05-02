@@ -14,11 +14,6 @@ public class UserCreateIn {
     @Email
     private String mail;
     private String password;
-
-    public boolean passwordIsValid(){
-        boolean ok = this.password.length() >= 8;
-        ok &= this.password.matches("[a-zA-Z0-9]*");
-        return ok;
-    }
+    private Integer typeUser;
 
 }

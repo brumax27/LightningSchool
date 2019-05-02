@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "UserMessage")
 @Table(name = "USER_MESSAGE")
 public class UserMessage implements Serializable {
 

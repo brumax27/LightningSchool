@@ -1,8 +1,9 @@
 package com.lightning.school.mvc.model.user;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public enum UserTypeEnum {
+public enum UserTypeEnum implements Serializable {
 
     ADMIN(1),
     TEACHER(2),

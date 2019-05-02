@@ -1,23 +1,30 @@
 package com.lightning.school.mvc.facade;
 
-import com.lightning.school.mvc.api.in.UserCreateIn;
 import com.lightning.school.mvc.api.in.UserLoginIn;
 import com.lightning.school.mvc.api.in.UserRecoveryIn;
-import com.lightning.school.mvc.api.out.UserCreateOut;
 import com.lightning.school.mvc.api.out.UserLoginOut;
 import com.lightning.school.mvc.delegate.mail.MailSender;
+import com.lightning.school.mvc.delegate.mail.MailTypeEnum;
+import com.lightning.school.mvc.facade.ControllerException.MailCustomException;
+import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
+import com.lightning.school.mvc.facade.ControllerException.UserNotFoundException;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
+import com.lightning.school.mvc.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+
+import static org.springframework.http.ResponseEntity.accepted;
 
 @RestController
 @RequestMapping
@@ -35,39 +42,45 @@ public class AuthController {
     }
 
     @PostMapping("/recovery/set-new-password")
-    public UserLoginOut recoveryPasssave(UserLoginIn in){
-        if (in.passwordIsValid()){
-            User userFinded = userRepository.getUserByMail(in.getMail());
-            userFinded.setPassword(bCryptPasswordEncoder.encode(in.getPassword()));
-            userFinded = userRepository.save(userFinded);
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity recoveryPasssave(UserLoginIn in){
+        if (PasswordUtil.passwordIsValid(in.getPassword())) {
+            throw new PasswordInvalidException();
         }
-        return new UserLoginOut("PASSWORD_OK");
-    }
 
-    @PostMapping("/register")
-    public UserCreateOut createAccount(@RequestBody UserCreateIn in){
-        if (in.passwordIsValid()) {
-            User userSaved = userRepository.save(new User(in.getMail(), bCryptPasswordEncoder.encode(in.getPassword())));
-            return new UserCreateOut(userSaved != null);
+        User userFinded = userRepository.getUserByMail(in.getMail());
+
+        if (userFinded == null){
+            throw new UserNotFoundException();
         }
-        return new UserCreateOut(false);
+        userFinded.setPassword(bCryptPasswordEncoder.encode(in.getPassword()));
+        userRepository.save(userFinded);
+
+        return accepted().body(new UserLoginOut("PASSWORD_OK"));
     }
 
     @PostMapping("/recovery")
-    public UserLoginOut recoveryPassword(UserRecoveryIn in){
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity recoveryPassword(UserRecoveryIn in){
         User userFinded = userRepository.getUserByMail(in.getMail());
-        if (userFinded != null) {
-            try {
-                MailSender.buildMail(javaMailSender)
-                        .loadTemplate("toto")
-                        .appendTo("toto@toto.fr")
-                        .appendSubject("toto")
-                        .appendProperties(new HashMap<String, String>())
-                        .send();
-            } catch (MailException ex) {
-                return new UserLoginOut(ex.getMessage());
-            }
+        if (userFinded == null ){
+            throw new UserNotFoundException();
         }
-        return new UserLoginOut("EMAIL_SEND");
+
+        MailTypeEnum mailType = MailTypeEnum.RECOVERY;
+        try {
+            MailSender.buildMail(javaMailSender)
+                    .loadTemplate(mailType.getTemplate())
+                    .appendTo(userFinded.getUserKey().getMail())
+                    .appendSubject(mailType.getSubject())
+                    .appendProperties(new HashMap<String, String>())
+                    .send();
+        } catch (MailException ex) {
+            throw new MailCustomException();
+        }
+
+        return accepted().body(new UserLoginOut("MAIL_SEND"));
     }
+
+
 }

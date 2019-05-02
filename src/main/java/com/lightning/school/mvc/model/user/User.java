@@ -1,5 +1,6 @@
 package com.lightning.school.mvc.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lightning.school.mvc.model.Group;
 import com.lightning.school.mvc.model.Section;
 import lombok.AllArgsConstructor;
@@ -14,8 +15,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-
+@Entity(name = "User")
 @Table(name = "USER")
 public class User implements Serializable {
 
@@ -28,23 +28,30 @@ public class User implements Serializable {
     @Column(name = "SURNAME")
     private String surname;
     @Column(name = "PASSWORD")
+    @JsonIgnore
     private String password;
     @Column(name = "PHOTO_PATH")
     private String userPhoto;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_section", updatable = false, insertable = false)
+    @JsonIgnore
     private List<Section> sections;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_group", updatable = false, insertable = false)
+    @JsonIgnore
     List<Group> groups;
 
-    public User(String email, String password){
+    public User(String email, String password, Integer typeUserId){
         this.password = password;
         this.userKey = new UserKey();
         this.userKey.setMail(email);
         this.userKey.setUserId(UUID.randomUUID().toString());
+        this.typeUserId = typeUserId;
     }
 
+    @JsonIgnore
     public UserTypeEnum getUserType(){
         return UserTypeEnum.retrieveTypeUserByValue(this.typeUserId);
     }

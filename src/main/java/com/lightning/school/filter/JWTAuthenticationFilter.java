@@ -4,6 +4,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lightning.school.mvc.api.in.UserLoginIn;
+import com.lightning.school.mvc.model.user.User;
+import com.lightning.school.mvc.model.user.UserTypeEnum;
+import com.lightning.school.mvc.repository.mysql.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,9 +25,11 @@ import static com.lightning.school.config.security.SecurityConstants.*;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AuthenticationManager authenticationManager;
+    private UserRepository userRepository;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -33,6 +38,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             UserLoginIn creds = new ObjectMapper()
                     .readValue(req.getInputStream(), UserLoginIn.class);
+
+            User userFinded = userRepository.getUserByMail(creds.getMail());
+
+            if (!UserTypeEnum.ADMIN.equals(userFinded.getUserType())) {
+                return authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                creds.getMail(),
+                                creds.getPassword()));
+            }
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(

@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Exercice")
 @Table(name = "EXERCICE")
 public class Exercice implements Serializable {
 
@@ -29,7 +29,8 @@ public class Exercice implements Serializable {
     @Column(name = "COEFFICIENT")
     private Float coeficient;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exercice_cours", updatable = false, insertable = false)
     List<Cours> cours;
 
     public ExerciceTypeEnum getExerciceType(){

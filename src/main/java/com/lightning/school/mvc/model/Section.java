@@ -12,22 +12,24 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Section")
 @Table(name = "SECTION")
 public class Section implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name = "ID_SECTION", nullable = false)
+    @Column(name = "ID_SECTION")
     private Integer sectionId;
     @Column(name = "LIBELLE_SECTION")
     private String sectionLabel;
     @Column(name = "YEAR_PROMOTION")
     private Integer promotionYear;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_users", updatable = false, insertable = false)
     private List<User> users;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_groups", updatable = false, insertable = false)
     private List<Cours> groups;
 }

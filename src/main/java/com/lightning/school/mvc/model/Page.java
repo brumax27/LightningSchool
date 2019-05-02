@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "Page")
 @Table(name = "PAGE")
 public class Page implements Serializable {
 
@@ -22,7 +22,8 @@ public class Page implements Serializable {
     @Column(name = "CONTENU_PAGE")
     private String pageContent;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "page_cours", updatable = false, insertable = false)
     List<Cours> cours;
 
 }

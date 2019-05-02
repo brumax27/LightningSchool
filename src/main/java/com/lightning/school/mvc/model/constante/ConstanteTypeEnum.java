@@ -1,5 +1,7 @@
 package com.lightning.school.mvc.model.constante;
 
-public enum  ConstanteTypeEnum {
+import java.io.Serializable;
+
+public enum  ConstanteTypeEnum implements Serializable {
     INT;
 }
