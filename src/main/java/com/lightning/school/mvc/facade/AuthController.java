@@ -27,7 +27,7 @@ import java.util.HashMap;
 import static org.springframework.http.ResponseEntity.accepted;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/recovery")
 public class AuthController {
 
     private UserRepository userRepository;
@@ -41,7 +41,7 @@ public class AuthController {
         this.javaMailSender = javaMailSender;
     }
 
-    @PostMapping("/recovery/set-new-password")
+    @PostMapping("/set-new-password")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity recoveryPasssave(UserLoginIn in){
         if (PasswordUtil.passwordIsValid(in.getPassword())) {
@@ -59,7 +59,7 @@ public class AuthController {
         return accepted().body(new UserLoginOut("PASSWORD_OK"));
     }
 
-    @PostMapping("/recovery")
+    @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity recoveryPassword(UserRecoveryIn in){
         User userFinded = userRepository.getUserByMail(in.getMail());
@@ -71,9 +71,9 @@ public class AuthController {
         try {
             MailSender.buildMail(javaMailSender)
                     .loadTemplate(mailType.getTemplate())
-                    .appendTo(userFinded.getUserKey().getMail())
+                    .appendTo(userFinded.getMail())
                     .appendSubject(mailType.getSubject())
-                    .appendProperties(new HashMap<String, String>())
+                    .appendProperties(new HashMap<>())
                     .send();
         } catch (MailException ex) {
             throw new MailCustomException();

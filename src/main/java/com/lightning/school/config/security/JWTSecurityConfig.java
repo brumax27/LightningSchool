@@ -27,20 +27,25 @@ public class JWTSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsServiceImpl userDetailsService;
     private UserRepository userRepository;
+    private SecurityDataConfig securityDataConfig;
 
-    public JWTSecurityConfig(UserDetailsServiceImpl userDetailsService, UserRepository userRepository) {
+    public JWTSecurityConfig(UserDetailsServiceImpl userDetailsService, UserRepository userRepository, SecurityDataConfig securityDataConfig) {
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
+        this.securityDataConfig = securityDataConfig;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, RECOVERY_URL).permitAll()
+                .antMatchers(HttpMethod.GET, "/", "/swagger-ui.html", "/webjars/**").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/swagger-resources/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), userRepository))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), securityDataConfig, userRepository))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityDataConfig))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
