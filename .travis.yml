@@ -14,12 +14,6 @@ cache:
   directories:
   - $HOME/.m2
 
-before_install:
-  - "docker-compose up -d"
-
-services:
-  - docker
-
 after_success:
   - chmod +x send.sh
   - ./send.sh success $WEBHOOK_URL

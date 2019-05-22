@@ -1,13 +1,12 @@
-package com.lightning.school.mvc.model.userExercice;
+package com.lightning.school.mvc.model;
 
+import com.lightning.school.mvc.model.exercice.Exercice;
+import com.lightning.school.mvc.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Data
@@ -17,8 +16,13 @@ import java.io.Serializable;
 @Table(name = "USER_EXERCICE")
 public class UserExercice implements Serializable {
 
-    @EmbeddedId
-    private UserExerciceKey userExerciceKey;
+    @Id
+    @GeneratedValue
+    private Integer id;
+    @OneToOne
+    private Exercice exercice;
+    @OneToOne
+    private User User;
     @Column(name = "PATH_RENDU")
     private String pathExerciceRender;
     @Column(name = "MARK")
