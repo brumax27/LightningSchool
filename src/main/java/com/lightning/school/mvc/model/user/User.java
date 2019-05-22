@@ -8,9 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +19,12 @@ import java.util.UUID;
 @Table(name = "USER")
 public class User implements Serializable {
 
-    @EmbeddedId
-    private UserKey userKey;
+    @Id
+    @GeneratedValue
+    private Integer userId;
+    @Email
+    @Column(name = "MAIL", nullable = false)
+    private String mail;
     @Column(name = "ID_T_USER")
     private Integer typeUserId;
     @Column(name = "NAME")
@@ -45,9 +49,7 @@ public class User implements Serializable {
 
     public User(String email, String password, Integer typeUserId){
         this.password = password;
-        this.userKey = new UserKey();
-        this.userKey.setMail(email);
-        this.userKey.setUserId(UUID.randomUUID().toString());
+        this.mail = email;
         this.typeUserId = typeUserId;
     }
 

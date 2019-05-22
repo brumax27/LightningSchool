@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class PasswordInvalidException extends RuntimeException {
 
     public PasswordInvalidException() {
-        super("passwor not valid (number, minuscule, majuscule, >8 , <32)");
+        super("password not valid (number, minuscule, majuscule, >8 , <32)");
     }
 }

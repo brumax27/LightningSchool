@@ -3,6 +3,7 @@ package com.lightning.school.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lightning.school.config.security.SecurityDataConfig;
 import com.lightning.school.mvc.api.in.UserLoginIn;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
@@ -21,15 +22,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.lightning.school.config.security.SecurityConstants.*;
-
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AuthenticationManager authenticationManager;
     private UserRepository userRepository;
+    private SecurityDataConfig securityDataConfig;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, SecurityDataConfig securityDataConfig, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
+        this.securityDataConfig = securityDataConfig;
     }
 
     @Override
@@ -67,8 +68,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String token = JWT.create()
                 .withSubject(auth.getPrincipal().toString())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(SECRET.getBytes()));
-        res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+                .withExpiresAt(new Date(System.currentTimeMillis() + securityDataConfig.getExpirationTime()))
+                .sign(Algorithm.HMAC512(securityDataConfig.getSecret().getBytes()));
+        res.addHeader(securityDataConfig.getHeaderString(), securityDataConfig.getTokenPrefix() + token);
     }
 }
