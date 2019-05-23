@@ -1,14 +1,19 @@
 package com.lightning.school.mvc.facade;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.lightning.school.config.security.SecurityDataConfig;
 import com.lightning.school.mvc.api.in.UserLoginIn;
 import com.lightning.school.mvc.api.in.UserRecoveryIn;
 import com.lightning.school.mvc.api.out.UserLoginOut;
 import com.lightning.school.mvc.delegate.mail.MailSender;
 import com.lightning.school.mvc.delegate.mail.MailTypeEnum;
+import com.lightning.school.mvc.facade.ControllerException.AuthException;
 import com.lightning.school.mvc.facade.ControllerException.MailCustomException;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.facade.ControllerException.UserNotFoundException;
 import com.lightning.school.mvc.model.user.User;
+import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,34 +22,57 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
 import static org.springframework.http.ResponseEntity.accepted;
 
 @RestController
-@RequestMapping("/api/recovery")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private JavaMailSender javaMailSender;
+    private SecurityDataConfig securityDataConfig;
 
     @Autowired
-    public AuthController(UserRepository userRepository ,BCryptPasswordEncoder bCryptPasswordEncoder, JavaMailSender javaMailSender) {
+    public AuthController(UserRepository userRepository ,BCryptPasswordEncoder bCryptPasswordEncoder, JavaMailSender javaMailSender, SecurityDataConfig securityDataConfig) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.javaMailSender = javaMailSender;
+        this.securityDataConfig = securityDataConfig;
     }
 
-    @PostMapping("/set-new-password")
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity loginUser(@RequestBody UserLoginIn in){
+
+        User userFinded = userRepository.getUserByMail(in.getMail());
+        if (userFinded == null){
+            throw new UserNotFoundException(in.getMail());
+        }
+
+        if (UserTypeEnum.ADMIN.equals(userFinded.getUserType()))
+            throw new AuthException();
+
+        boolean auth = bCryptPasswordEncoder.matches(in.getPassword(), userFinded.getPassword());
+
+        if (!auth)
+            throw new AuthException();
+
+        String token = JWT.create()
+                .withSubject(userFinded.toString())
+                .sign(Algorithm.HMAC512(securityDataConfig.getSecret().getBytes()));
+
+        return accepted().header(securityDataConfig.getHeaderString(), securityDataConfig.getTokenPrefix() + token).build();
+    }
+
+    @GetMapping("/recovery/set-new-password")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity recoveryPasssave(UserLoginIn in){
-        if (PasswordUtil.passwordIsValid(in.getPassword())) {
+        if (!PasswordUtil.passwordIsValid(in.getPassword())) {
             throw new PasswordInvalidException();
         }
 
@@ -59,9 +87,9 @@ public class AuthController {
         return accepted().body(new UserLoginOut("PASSWORD_OK"));
     }
 
-    @PostMapping
+    @PostMapping("/recovery")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity recoveryPassword(UserRecoveryIn in){
+    public ResponseEntity recoveryPassword(@RequestBody UserRecoveryIn in){
         User userFinded = userRepository.getUserByMail(in.getMail());
         if (userFinded == null ){
             throw new UserNotFoundException();
