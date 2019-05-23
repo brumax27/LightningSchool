@@ -58,4 +58,12 @@ public class User implements Serializable {
         return UserTypeEnum.retrieveTypeUserByValue(this.typeUserId);
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", mail='" + mail + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

@@ -36,4 +36,9 @@ public class GlobalExceptionHandler {
         return badRequest().body(new ErrorDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity handleException(AuthException ex){
+        return badRequest().body(new ErrorDto(ex.getMessage()));
+    }
+
 }
