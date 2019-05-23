@@ -1,5 +1,6 @@
 package com.lightning.school.mvc.delegate.mail;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 public class MailSender {
@@ -31,7 +33,12 @@ public class MailSender {
     public MailSender loadTemplate(String name){
         try {
             File file = ResourceUtils.getFile("classpath:mail/template/"+name+".html");
-            new FileInputStream(file).read(TEMPLATE_CONTENT.getBytes());
+            FileInputStream inputStream = new FileInputStream(file);
+            try {
+                TEMPLATE_CONTENT = IOUtils.toString(inputStream, Charset.forName("utf-8"));
+            } finally {
+                inputStream.close();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e){
