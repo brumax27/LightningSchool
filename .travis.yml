@@ -6,6 +6,7 @@ env:
   - MAVEN_VERSION=3.3.9
 
 before_install:
+  - chmod +x ./ecr_credentials.sh
   - ./ecr_credentials.sh
 
 install:
