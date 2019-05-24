@@ -6,8 +6,9 @@ env:
   - MAVEN_VERSION=3.3.9
 
 install:
+  - curl -o $HOME/.m2/settings.xml https://raw.githubusercontent.com/trajano/trajano/master/src/site/resources/settings.xml
   - "mvn -N io.takari:maven:wrapper -Dmaven=${MAVEN_VERSION}"
-  - "./mvnw --show-version --errors --batch-mode test-compile"
+  - "./mvnw --show-version --errors --batch-mode test-compile dependency:go-offline"
 script: "./mvnw --show-version --errors --batch-mode clean install"
 
 cache:
