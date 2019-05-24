@@ -4,9 +4,9 @@ jdk: oraclejdk8
 
 env:
   - MAVEN_VERSION=3.3.9
-  - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-  - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-  - REGION=$REGION
+
+before_install:
+  - ./ecr_credentials.sh
 
 install:
   - "mvn -N io.takari:maven:wrapper -Dmaven=${MAVEN_VERSION}"
