@@ -1,6 +1,7 @@
 package com.lightning.school.mvc.delegate.aws;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -49,35 +50,53 @@ public class MediaStoreService {
                 .build();
     }
 
-    public String putMedia(String nameFile, MultipartFile multipartFile){
+    public String putMedia(MultipartFile multipartFile){
 
         String bucketName = mediaStoreConfig.getBucketName();
-        String key = nameFile.trim();
-        key = key.replaceAll("[0-9\\(\\)]*","-");
-
+        String key = formalizeNameFile(multipartFile.getOriginalFilename());
         File file = null;
         try {
-            file = File.createTempFile("aws-java-sdk-", "");
-            file.deleteOnExit();
-            copyInputStreamToFile(multipartFile.getInputStream(), file);
+            file = copyInputStreamToFile(multipartFile.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        PutObjectRequest objectRequest = new PutObjectRequest(bucketName, "public/"+key, file).withCannedAcl(CannedAccessControlList.PublicRead);
-        s3.putObject(objectRequest);
+        s3.putObject(new PutObjectRequest(bucketName, "public/"+key, file).withCannedAcl(CannedAccessControlList.PublicRead));
 
         return mediaStoreConfig.getBaseMedia() + key;
     }
 
-    private void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            int read;
-            byte[] bytes = new byte[1024];
-
-            while ((read = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
-            }
+    public boolean deleteMedia(String namefile){
+        try {
+            s3.deleteObject(mediaStoreConfig.getBucketName(), namefile);
+        } catch (SdkClientException ex){
+            return false;
         }
+        return true;
+    }
+
+    private File copyInputStreamToFile(InputStream inputStream) {
+        File file = null;
+        try {
+            file = File.createTempFile("temp-file", "");
+            file.deleteOnExit();
+            try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                int read;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
+    }
+
+    private String formalizeNameFile(String nameFile){
+        nameFile = nameFile.replaceAll("\\s+","");
+        nameFile = nameFile.replaceAll("[\\@\\/\\:\\;\\!\\,\\?\\+\\-\\*\\(\\)\\{\\}\\#]","");
+        return nameFile;
     }
 }

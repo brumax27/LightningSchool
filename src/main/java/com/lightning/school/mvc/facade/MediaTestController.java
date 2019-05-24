@@ -18,7 +18,7 @@ public class MediaTestController {
 
     @RequestMapping(value = "", headers = "Content-Type= multipart/form-data", method = RequestMethod.POST)
     public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) {
-       String urlFile = mediaStoreService.putMedia(file.getOriginalFilename(), file);
+       String urlFile = mediaStoreService.putMedia(file);
        return ResponseEntity.ok(urlFile);
     }
 }
