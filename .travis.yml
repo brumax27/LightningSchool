@@ -13,6 +13,7 @@ deploy:
   region: "eu-west-3"
   app: "lightnin-school"
   env: "LightninSchool-env"
+  bucket_name: "eb-lightning-school"
 
 env:
   - MAVEN_VERSION=3.3.9
