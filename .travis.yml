@@ -2,19 +2,6 @@ language: java
 
 jdk: oraclejdk8
 
-before_deploy:
-  - chmod +x ./ecr_credentials.sh
-  - ./ecr_credentials.sh
-
-deploy:
-  provider: elasticbeanstalk
-  access_key_id: $AWS_ACCESS_KEY_ID
-  secret_access_key: $AWS_SECRET_ACCESS_KEY
-  region: "eu-west-3"
-  app: "lightnin-school"
-  env: "LightninSchool-env"
-  bucket_name: "eb-lightning-school"
-
 env:
   - MAVEN_VERSION=3.3.9
 
