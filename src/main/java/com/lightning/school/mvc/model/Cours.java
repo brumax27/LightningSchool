@@ -25,20 +25,22 @@ public class Cours implements Serializable {
     private String coursLabel;
     @Column(name = "DEADLINE")
     private LocalDateTime deadline;
+    @Column(name = "link_cours")
+    private String linkCours;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cours_sections", updatable = false, insertable = false)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cours_pages", updatable = false, insertable = false)
-    List<Page> pages;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cours_exercices", updatable = false, insertable = false)
+    @OneToMany(cascade = CascadeType.ALL)
     List<Exercice> exercices;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cours_medias", updatable = false, insertable = false)
+    @OneToMany(cascade = CascadeType.ALL)
     List<Media> medias;
+
+    public Cours(String coursLabel, LocalDateTime deadline, String linkCours, List<Media> medias) {
+        this.coursLabel = coursLabel;
+        this.deadline = deadline;
+        this.linkCours = linkCours;
+        this.medias = medias;
+    }
 }

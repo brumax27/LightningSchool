@@ -1,11 +1,13 @@
 package com.lightning.school.mvc.facade;
 
-import com.lightning.school.mvc.api.in.UserCreateIn;
-import com.lightning.school.mvc.api.in.UserUpdateIn;
+import com.lightning.school.mvc.api.in.user.UserCreateIn;
+import com.lightning.school.mvc.api.in.user.UserUpdateIn;
+import com.lightning.school.mvc.api.out.UserItem;
+import com.lightning.school.mvc.delegate.aws.MediaStoreService;
+import com.lightning.school.mvc.delegate.crud.UserCrudServiceImpl;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
-import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.PasswordUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,9 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.constraints.Email;
 import java.net.URI;
 import java.util.List;
 
@@ -29,31 +31,27 @@ import static org.springframework.http.ResponseEntity.created;
 @Api(description = "Gestion des utilisateurs")
 public class UserController {
 
-    private UserRepository userRepository;
+    private UserCrudServiceImpl userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private MediaStoreService mediaStoreService;
 
     @Autowired
-    public UserController(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserController(UserCrudServiceImpl userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, MediaStoreService mediaStoreService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.mediaStoreService = mediaStoreService;
     }
 
     @GetMapping
     @ApiOperation("Liste les utilisateurs")
-    public List<User> getUsers(){
-        return userRepository.findAll();
-    }
-
-    @GetMapping("/mail/{mail}")
-    @ApiOperation("Obtien le detail utilisateur")
-    public User getUserByMail(@ApiParam("mail de l'utilisateur")@PathVariable("mail") @Email String mail){
-        return userRepository.getUserByMail(mail);
+    public List<UserItem> getUsers(){
+        return userRepository.getAll();
     }
 
     @GetMapping("/id/{userId}")
     @ApiOperation("Obtien le detail utilisateur")
     public User getUserById(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId){
-        return userRepository.getUserById(userId);
+        return userRepository.getByIdUser(userId);
     }
 
     @PostMapping
@@ -68,17 +66,17 @@ public class UserController {
             typeUser = user.getTypeUser();
 
         User userFinded = new User(user.getMail(), bCryptPasswordEncoder.encode(user.getPassword()), UserTypeEnum.retrieveValueByUserType(typeUser));
-        userFinded = userRepository.save(userFinded);
-        URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userFinded.getUserId()).toUri();
+        UserItem userItem  = userRepository.save(userFinded);
+        URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userItem.getId()).toUri();
         return created(uri).build();
     }
 
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @ApiOperation("Modifie l'utilisateur")
-    public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestParam("file") MultipartFile file, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
 
-        User userFinded = userRepository.getUserById(userId);
+        User userFinded = userRepository.getByIdUser(userId);
 
         if (!StringUtils.isEmpty(user.getPassword())) {
             if (!PasswordUtil.passwordIsValid(user.getPassword())) {
@@ -98,12 +96,14 @@ public class UserController {
 
         if (!StringUtils.isEmpty(user.getUserPhoto()))
             userFinded.setUserPhoto(user.getUserPhoto());
+        else if (file != null && user.getUserPhoto() == null)
+            userFinded.setUserPhoto(mediaStoreService.putMedia(file));
 
         if (user.getUserType()!= null && UserTypeEnum.ADMIN.equals(UserTypeEnum.retrieveTypeUserByValue(userFinded.getTypeUserId()))) {
             userFinded.setTypeUserId(UserTypeEnum.retrieveValueByUserType(user.getUserType()));
         }
 
-        userFinded = userRepository.save(userFinded);
+        userFinded = userRepository.saveUser(userFinded);
         URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userFinded.getUserId()).toUri();
         return created(uri).build();
     }

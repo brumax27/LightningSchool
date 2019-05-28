@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class AuthException extends RuntimeException {
 
     public AuthException() {
-        super("User not authenticate because mail or password isn't valid");
+        super("User not authenticate or not Permission");
     }
 }

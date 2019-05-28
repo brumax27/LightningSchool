@@ -1,4 +1,4 @@
-package com.lightning.school.mvc.api.in;
+package com.lightning.school.mvc.api.in.user;
 
 import com.lightning.school.mvc.model.user.UserTypeEnum;
 import io.swagger.annotations.ApiModel;

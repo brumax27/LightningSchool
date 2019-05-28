@@ -1,13 +1,12 @@
 package com.lightning.school.mvc.model.exercice;
 
-import com.lightning.school.mvc.model.Cours;
+import com.lightning.school.mvc.api.in.ExerciceIn;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,12 +28,13 @@ public class Exercice implements Serializable {
     @Column(name = "COEFFICIENT")
     private Float coeficient;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "exercice_cours", updatable = false, insertable = false)
-    List<Cours> cours;
-
     public ExerciceTypeEnum getExerciceType(){
         return ExerciceTypeEnum.retrieveExercieTypeEnumByValue(this.exerciceTypeId);
     }
 
+    public Exercice(ExerciceIn in) {
+        this.exerciceTypeId = ExerciceTypeEnum.TEACHER.getValue();
+        this.exerciceLabel = in.getExerciceLabel();
+        this.coeficient = in.getCoeficient();
+    }
 }
