@@ -1,5 +1,7 @@
 package com.lightning.school.mvc.model.user;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -9,6 +11,7 @@ public enum UserTypeEnum implements Serializable {
     TEACHER(2),
     STUDENT(3);
 
+    @Getter
     private Integer value;
 
     UserTypeEnum(Integer value) {

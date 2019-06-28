@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lightning.school.config.security.SecurityDataConfig;
-import com.lightning.school.mvc.api.in.UserLoginIn;
+import com.lightning.school.mvc.api.in.user.UserLoginIn;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.UserRepository;

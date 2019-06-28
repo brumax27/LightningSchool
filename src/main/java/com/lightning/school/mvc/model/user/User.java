@@ -1,7 +1,7 @@
 package com.lightning.school.mvc.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lightning.school.mvc.model.Group;
+import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.model.Section;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,20 +37,25 @@ public class User implements Serializable {
     @Column(name = "PHOTO_PATH")
     private String userPhoto;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_section", updatable = false, insertable = false)
-    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_group", updatable = false, insertable = false)
-    @JsonIgnore
-    List<Group> groups;
+//    @ManyToMany
+//    List<Group> groups;
 
     public User(String email, String password, Integer typeUserId){
         this.password = password;
         this.mail = email;
         this.typeUserId = typeUserId;
+    }
+
+    public User(UserItem item){
+        this.userId = item.getId();
+        this.mail = item.getMail();
+        this.typeUserId = UserTypeEnum.retrieveValueByUserType(item.getUserTypeEnum());
+        this.name = item.getName();
+        this.surname = item.getSurmane();
+        this.userPhoto = item.getUserPhoto();
     }
 
     @JsonIgnore

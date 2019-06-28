@@ -19,11 +19,11 @@ public class UserMessage implements Serializable {
     @GeneratedValue
     @Column(name = "ID_USER_MESSAGE")
     private Integer userMessageId;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private User sender;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private User receiver;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Message message;
 
 }

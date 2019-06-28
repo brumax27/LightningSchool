@@ -10,6 +10,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.lightning.school.config.MediaStoreConfig;
+import com.lightning.school.mvc.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +54,7 @@ public class MediaStoreService {
     public String putMedia(MultipartFile multipartFile){
 
         String bucketName = mediaStoreConfig.getBucketName();
-        String key = formalizeNameFile(multipartFile.getOriginalFilename());
+        String key = StringUtils.formalizeNameFile(multipartFile.getOriginalFilename());
         File file = null;
         try {
             file = copyInputStreamToFile(multipartFile.getInputStream());
@@ -92,11 +93,5 @@ public class MediaStoreService {
             e.printStackTrace();
         }
         return file;
-    }
-
-    private String formalizeNameFile(String nameFile){
-        nameFile = nameFile.replaceAll("\\s+","");
-        nameFile = nameFile.replaceAll("[\\@\\/\\:\\;\\!\\,\\?\\+\\-\\*\\(\\)\\{\\}\\#]","");
-        return nameFile;
     }
 }

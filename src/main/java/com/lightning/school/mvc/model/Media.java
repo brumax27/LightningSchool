@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,7 +23,8 @@ public class Media implements Serializable {
     @Column(name = "PATH")
     private String path;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "media_cours", updatable = false, insertable = false)
-    List<Cours> cours;
+    public Media(String label, String path) {
+        this.label = label;
+        this.path = path;
+    }
 }

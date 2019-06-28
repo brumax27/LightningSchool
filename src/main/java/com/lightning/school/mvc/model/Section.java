@@ -1,5 +1,6 @@
 package com.lightning.school.mvc.model;
 
+import com.lightning.school.mvc.api.in.promo.SectionCreateIn;
 import com.lightning.school.mvc.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,11 +26,14 @@ public class Section implements Serializable {
     @Column(name = "YEAR_PROMOTION")
     private Integer promotionYear;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_users", updatable = false, insertable = false)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<User> users;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_groups", updatable = false, insertable = false)
-    private List<Cours> groups;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Cours> cours;
+
+    public Section(SectionCreateIn in) {
+        this.sectionLabel = in.getSectionLabel();
+        this.promotionYear = in.getPromotionYear();
+    }
 }
