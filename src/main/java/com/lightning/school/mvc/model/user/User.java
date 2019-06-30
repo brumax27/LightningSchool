@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.model.Section;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity(name = "User")
 @Table(name = "USER")
+@Builder
 public class User implements Serializable {
 
     @Id
@@ -39,9 +41,6 @@ public class User implements Serializable {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
-
-//    @ManyToMany
-//    List<Group> groups;
 
     public User(String email, String password, Integer typeUserId){
         this.password = password;

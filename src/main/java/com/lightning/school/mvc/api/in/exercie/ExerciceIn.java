@@ -1,4 +1,4 @@
-package com.lightning.school.mvc.api.in;
+package com.lightning.school.mvc.api.in.exercie;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,5 +13,6 @@ public class ExerciceIn {
     private String exerciceLabel;
     private Float coeficient;
     private Integer coursId;
+    private Graph graph;
 
 }

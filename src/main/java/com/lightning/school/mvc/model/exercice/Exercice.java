@@ -1,6 +1,7 @@
 package com.lightning.school.mvc.model.exercice;
 
-import com.lightning.school.mvc.api.in.ExerciceIn;
+import com.lightning.school.mvc.api.in.exercie.ExerciceIn;
+import com.lightning.school.mvc.model.graph.component.Composant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,8 +24,10 @@ public class Exercice implements Serializable {
     private Integer exerciceTypeId;
     @Column(name = "LIBELLE_EXERCICE")
     private String exerciceLabel;
-    @Column(name = "PATH")
-    private String exercicePath;
+    @OneToOne
+    private Composant composant;
+    @OneToOne
+    private Composant composantCorriger;
     @Column(name = "COEFFICIENT")
     private Float coeficient;
 

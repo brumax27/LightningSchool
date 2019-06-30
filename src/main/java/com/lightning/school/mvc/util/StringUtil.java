@@ -1,8 +1,8 @@
 package com.lightning.school.mvc.util;
 
-public final class StringUtils {
+public final class StringUtil {
 
-    private StringUtils() {
+    private StringUtil() {
     }
 
     public static String formalizeNameFile(String nameFile){

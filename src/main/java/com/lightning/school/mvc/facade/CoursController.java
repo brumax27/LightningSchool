@@ -1,6 +1,6 @@
 package com.lightning.school.mvc.facade;
 
-import com.lightning.school.mvc.api.in.ExerciceIn;
+import com.lightning.school.mvc.api.in.exercie.ExerciceIn;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.facade.ControllerException.CrudException;
 import com.lightning.school.mvc.model.Cours;
@@ -9,6 +9,7 @@ import com.lightning.school.mvc.model.exercice.Exercice;
 import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
 import com.lightning.school.mvc.repository.mysql.SectionRepository;
+import com.lightning.school.mvc.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -132,7 +132,7 @@ public class CoursController {
         //TODO Neo4J exo put
 
         if (CollectionUtils.isEmpty(cours.getExercices())){
-            cours.setExercices(new ArrayList<Exercice>(Arrays.asList(exo)));
+            cours.setExercices(Arrays.asList(exo));
         } else {
             cours.getExercices().add(exo);
         }
@@ -179,7 +179,7 @@ public class CoursController {
 
     private Media createMedia(MultipartFile file){
         String url = mediaStoreService.putMedia(file);
-        return new Media(com.lightning.school.mvc.util.StringUtils.formalizeNameFile(file.getOriginalFilename()), url);
+        return new Media(StringUtil.formalizeNameFile(file.getOriginalFilename()), url);
     }
 
 }
