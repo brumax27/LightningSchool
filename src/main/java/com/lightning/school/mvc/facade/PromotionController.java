@@ -47,7 +47,7 @@ public class PromotionController {
     @GetMapping("/id/{sectionId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Section getId(@PathVariable("sectionId") Integer id){
-        return sectionRepository.findById(id).get();
+        return sectionRepository.findById(id).orElseThrow(CrudException::new);
     }
 
     @PostMapping
@@ -67,7 +67,7 @@ public class PromotionController {
         if (sectionUpdateIn.getId() == null){
             throw new CrudException();
         }
-        Section promo = sectionRepository.findById(sectionUpdateIn.getId()).get();
+        Section promo = sectionRepository.findById(sectionUpdateIn.getId()).orElseThrow(CrudException::new);
 
         if (!StringUtils.isEmpty(sectionUpdateIn.getSectionLabel()))
             promo.setSectionLabel(sectionUpdateIn.getSectionLabel());

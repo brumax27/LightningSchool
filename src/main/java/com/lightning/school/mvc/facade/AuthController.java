@@ -8,13 +8,11 @@ import com.lightning.school.mvc.api.in.user.UserRecoveryIn;
 import com.lightning.school.mvc.api.out.UserLoginOut;
 import com.lightning.school.mvc.delegate.mail.MailSender;
 import com.lightning.school.mvc.delegate.mail.MailTypeEnum;
-import com.lightning.school.mvc.facade.ControllerException.AuthException;
-import com.lightning.school.mvc.facade.ControllerException.MailCustomException;
-import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
-import com.lightning.school.mvc.facade.ControllerException.UserNotFoundException;
+import com.lightning.school.mvc.facade.ControllerException.*;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
+import com.lightning.school.mvc.util.Closures;
 import com.lightning.school.mvc.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +47,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity loginUser(@RequestBody UserLoginIn in){
 
-        User userFinded = userRepository.getUserByMail(in.getMail());
+        User userFinded = Closures.opt( () -> userRepository.getUserByMail(in.getMail())).orElseThrow(CrudException::new);
         if (userFinded == null){
             throw new UserNotFoundException(in.getMail());
         }
@@ -76,11 +74,7 @@ public class AuthController {
             throw new PasswordInvalidException();
         }
 
-        User userFinded = userRepository.getUserByMail(in.getMail());
-
-        if (userFinded == null){
-            throw new UserNotFoundException();
-        }
+        User userFinded = Closures.opt(() -> userRepository.getUserByMail(in.getMail())).orElseThrow(UserNotFoundException::new);
         userFinded.setPassword(bCryptPasswordEncoder.encode(in.getPassword()));
         userRepository.save(userFinded);
 
@@ -90,11 +84,7 @@ public class AuthController {
     @PostMapping("/recovery")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity recoveryPassword(@RequestBody UserRecoveryIn in){
-        User userFinded = userRepository.getUserByMail(in.getMail());
-        if (userFinded == null ){
-            throw new UserNotFoundException();
-        }
-
+        User userFinded = Closures.opt(() -> userRepository.getUserByMail(in.getMail())).orElseThrow(UserNotFoundException::new);
         MailTypeEnum mailType = MailTypeEnum.RECOVERY;
         try {
             MailSender.buildMail(javaMailSender)
