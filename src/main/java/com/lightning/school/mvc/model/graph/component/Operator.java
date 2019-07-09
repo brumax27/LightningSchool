@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Operator {
+public class Operator implements Node {
 
     private Output out;
     private List<Input> inputs;

@@ -10,4 +10,5 @@ public class Graph {
     private Output outG;
     private List<Input> inputsG;
     private List<Operator> body;
+    private List<Edge> edges;
 }
