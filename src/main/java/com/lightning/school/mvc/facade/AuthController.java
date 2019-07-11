@@ -15,6 +15,7 @@ import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.Closures;
 import com.lightning.school.mvc.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -64,7 +65,11 @@ public class AuthController {
                 .withSubject(userFinded.toString())
                 .sign(Algorithm.HMAC512(securityDataConfig.getSecret().getBytes()));
 
-        return accepted().header(securityDataConfig.getHeaderString(), securityDataConfig.getTokenPrefix() + token).build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(securityDataConfig.getHeaderString(), securityDataConfig.getTokenPrefix() + token);
+        headers.add("Access-Control-Expose-Headers", securityDataConfig.getHeaderString());
+        headers.add("Content-Security-Policy", "default-src 'self'; img-src https://*; child-src 'none';");
+        return accepted().headers(headers).build();
     }
 
     @GetMapping("/recovery/set-new-password")
