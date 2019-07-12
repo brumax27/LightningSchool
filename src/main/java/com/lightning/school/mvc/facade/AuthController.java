@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.lightning.school.config.security.SecurityDataConfig;
 import com.lightning.school.mvc.api.in.user.UserLoginIn;
 import com.lightning.school.mvc.api.in.user.UserRecoveryIn;
+import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.api.out.UserLoginOut;
 import com.lightning.school.mvc.delegate.mail.MailSender;
 import com.lightning.school.mvc.delegate.mail.MailTypeEnum;
@@ -71,7 +72,8 @@ public class AuthController {
         headers.add(securityDataConfig.getHeaderString(), securityDataConfig.getTokenPrefix() + token);
         headers.add("Access-Control-Expose-Headers", securityDataConfig.getHeaderString());
         headers.add("Content-Security-Policy", "default-src 'self'; img-src https://*; child-src 'none';");
-        return accepted().headers(headers).build();
+
+        return accepted().headers(headers).body(new UserItem(userFinded));
     }
 
     @GetMapping("/recovery/set-new-password")
