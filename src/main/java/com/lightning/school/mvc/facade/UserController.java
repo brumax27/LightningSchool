@@ -6,6 +6,7 @@ import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.delegate.crud.UserCrudServiceImpl;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
+import com.lightning.school.mvc.facade.ControllerException.UserExistedException;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.util.PasswordUtil;
@@ -64,6 +65,11 @@ public class UserController {
         UserTypeEnum typeUser = UserTypeEnum.STUDENT;
         if (!UserTypeEnum.STUDENT.equals(user.getTypeUser()))
             typeUser = user.getTypeUser();
+
+        User userMailFind = userRepository.getByMail(user.getMail());
+        if (userMailFind != null) {
+            throw new UserExistedException(user.getMail());
+        }
 
         User userFinded = new User(user.getMail(), bCryptPasswordEncoder.encode(user.getPassword()), UserTypeEnum.retrieveValueByUserType(typeUser));
         UserItem userItem  = userRepository.save(userFinded);

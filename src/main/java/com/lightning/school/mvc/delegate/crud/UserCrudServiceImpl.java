@@ -36,4 +36,8 @@ public class UserCrudServiceImpl {
     public User saveUser(User user){
         return userRepository.save(user);
     }
+
+    public User getByMail(String mail) {
+        return userRepository.getUserByMail(mail);
+    }
 }
