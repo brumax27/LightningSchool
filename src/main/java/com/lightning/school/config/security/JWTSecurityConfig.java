@@ -1,9 +1,7 @@
 package com.lightning.school.config.security;
 
-import com.lightning.school.filter.JWTAuthenticationFilter;
 import com.lightning.school.filter.JWTAuthorizationFilter;
 import com.lightning.school.mvc.repository.mysql.UserDetailsServiceImpl;
-import com.lightning.school.mvc.repository.mysql.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -18,34 +16,29 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static com.lightning.school.config.security.SecurityConstants.RECOVERY_URL;
-
 @Configuration
 @EnableWebSecurity
 @DependsOn("userRepository")
 public class JWTSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsServiceImpl userDetailsService;
-    private UserRepository userRepository;
     private SecurityDataConfig securityDataConfig;
 
-    public JWTSecurityConfig(UserDetailsServiceImpl userDetailsService, UserRepository userRepository, SecurityDataConfig securityDataConfig) {
+    public JWTSecurityConfig(UserDetailsServiceImpl userDetailsService, SecurityDataConfig securityDataConfig) {
         this.userDetailsService = userDetailsService;
-        this.userRepository = userRepository;
         this.securityDataConfig = securityDataConfig;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login" ,RECOVERY_URL, "/api/auth/login").permitAll()
+                .antMatchers(HttpMethod.POST ,"/api/auth/recovery", "/api/auth/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/", "/swagger-ui.html", "/webjars/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/media").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), securityDataConfig, userRepository))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityDataConfig))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

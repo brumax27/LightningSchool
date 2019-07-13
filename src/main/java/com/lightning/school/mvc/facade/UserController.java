@@ -72,7 +72,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Modifie l'utilisateur")
     public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestParam("file") MultipartFile file, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
 

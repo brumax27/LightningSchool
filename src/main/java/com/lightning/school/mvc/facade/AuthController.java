@@ -14,7 +14,6 @@ import com.lightning.school.mvc.facade.ControllerException.MailCustomException;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.facade.ControllerException.UserNotFoundException;
 import com.lightning.school.mvc.model.user.User;
-import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import static org.springframework.http.ResponseEntity.accepted;
@@ -56,9 +56,6 @@ public class AuthController {
             throw new UserNotFoundException(in.getMail());
         }
 
-        if (UserTypeEnum.ADMIN.equals(userFinded.getUserType()))
-            throw new AuthException();
-
         boolean auth = bCryptPasswordEncoder.matches(in.getPassword(), userFinded.getPassword());
 
         if (!auth)
@@ -66,6 +63,7 @@ public class AuthController {
 
         String token = JWT.create()
                 .withSubject(userFinded.toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + securityDataConfig.getExpirationTime()))
                 .sign(Algorithm.HMAC512(securityDataConfig.getSecret().getBytes()));
 
         HttpHeaders headers = new HttpHeaders();
