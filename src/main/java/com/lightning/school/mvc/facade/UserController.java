@@ -80,7 +80,7 @@ public class UserController {
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Modifie l'utilisateur")
-    public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestParam("file") MultipartFile file, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
 
         User userFinded = userRepository.getByIdUser(userId);
 
@@ -102,12 +102,25 @@ public class UserController {
 
         if (!StringUtils.isEmpty(user.getUserPhoto()))
             userFinded.setUserPhoto(user.getUserPhoto());
-        else if (file != null && user.getUserPhoto() == null)
-            userFinded.setUserPhoto(mediaStoreService.putMedia(file));
 
         if (user.getUserType()!= null && UserTypeEnum.ADMIN.equals(UserTypeEnum.retrieveTypeUserByValue(userFinded.getTypeUserId()))) {
             userFinded.setTypeUserId(UserTypeEnum.retrieveValueByUserType(user.getUserType()));
         }
+
+        userFinded = userRepository.saveUser(userFinded);
+        URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userFinded.getUserId()).toUri();
+        return created(uri).build();
+    }
+
+    @PutMapping("/{userId}/image")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation("Modifie l'image d'un utilisateur")
+    public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestParam("image") MultipartFile image, UriComponentsBuilder uriBuilder) {
+
+        User userFinded = userRepository.getByIdUser(userId);
+
+        if (image != null)
+            userFinded.setUserPhoto(mediaStoreService.putMedia(image));
 
         userFinded = userRepository.saveUser(userFinded);
         URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userFinded.getUserId()).toUri();
