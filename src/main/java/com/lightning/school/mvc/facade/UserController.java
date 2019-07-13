@@ -77,6 +77,7 @@ public class UserController {
         return created(uri).build();
     }
 
+    @CrossOrigin
     @PutMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Modifie l'utilisateur")
