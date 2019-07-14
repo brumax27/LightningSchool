@@ -77,8 +77,7 @@ public class UserController {
         return created(uri).build();
     }
 
-    @CrossOrigin
-    @PutMapping("/{userId}")
+    @PostMapping("/{userId}/edit")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Modifie l'utilisateur")
     public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
@@ -113,7 +112,7 @@ public class UserController {
         return created(uri).build();
     }
 
-    @PutMapping("/{userId}/image")
+    @PostMapping("/{userId}/image")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Modifie l'image d'un utilisateur")
     public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestParam("image") MultipartFile image, UriComponentsBuilder uriBuilder) {

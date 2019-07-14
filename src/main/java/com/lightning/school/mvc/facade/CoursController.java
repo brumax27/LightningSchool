@@ -81,7 +81,7 @@ public class CoursController {
         return created(uri).build();
     }
 
-    @PutMapping
+    @PostMapping("/edit")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity updateCours(@RequestParam("medias") MultipartFile[] mediasFile, @RequestParam("cours") MultipartFile coursFile,
                                       @RequestParam("coursLabel") String coursLabel, @RequestParam("coursId") Integer coursId, @RequestParam(value = "exoId", required = false) Integer[] exoIds,
@@ -143,7 +143,7 @@ public class CoursController {
         return created(uri).build();
     }
 
-    @PutMapping("/exercices")
+    @PostMapping("/exercices/edit")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity updateExercice(@RequestBody ExerciceIn in, UriComponentsBuilder uriBuilder){
 
