@@ -52,4 +52,9 @@ public class GlobalExceptionHandler {
         return badRequest().body(new ErrorDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(NoDataException.class)
+    public ResponseEntity handleException(NoDataException ex) {
+        return badRequest().body(new ErrorDto(ex.getMessage()));
+    }
+
 }
