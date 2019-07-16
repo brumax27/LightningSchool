@@ -11,5 +11,7 @@ public class SectionCreateIn {
 
     private String sectionLabel;
     private Integer promotionYear;
+    private Integer teacherId;
+
 
 }
