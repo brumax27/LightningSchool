@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class CrudException extends RuntimeException {
 
     public CrudException() {
-        super("Error data in payload");
+        super("Error data in payload or Query");
     }
 }

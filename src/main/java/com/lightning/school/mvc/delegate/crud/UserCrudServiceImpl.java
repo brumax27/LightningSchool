@@ -40,4 +40,8 @@ public class UserCrudServiceImpl {
     public User getByMail(String mail) {
         return userRepository.getUserByMail(mail);
     }
+
+    public void deleteUser(Integer id) {
+        userRepository.deleteById(id);
+    }
 }

@@ -5,10 +5,12 @@ import com.lightning.school.mvc.api.in.user.UserUpdateIn;
 import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.delegate.crud.UserCrudServiceImpl;
+import com.lightning.school.mvc.facade.ControllerException.CrudException;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.facade.ControllerException.UserExistedException;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
+import com.lightning.school.mvc.util.Closures;
 import com.lightning.school.mvc.util.PasswordUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -125,6 +127,15 @@ public class UserController {
         userFinded = userRepository.saveUser(userFinded);
         URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userFinded.getUserId()).toUri();
         return created(uri).build();
+    }
+
+    @PostMapping("/{userId}/delete")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation("Supprime un utilisateur")
+    public ResponseEntity delete(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer pUserId){
+        Integer userId = Closures.opt(() -> pUserId).orElseThrow(CrudException::new);
+        userRepository.deleteUser(userId);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -3,12 +3,13 @@ package com.lightning.school.mvc.facade;
 import com.lightning.school.mvc.api.in.ExerciceIn;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.facade.ControllerException.CrudException;
+import com.lightning.school.mvc.facade.ControllerException.NoDataException;
 import com.lightning.school.mvc.model.Cours;
 import com.lightning.school.mvc.model.Media;
 import com.lightning.school.mvc.model.exercice.Exercice;
 import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
-import com.lightning.school.mvc.repository.mysql.SectionRepository;
+import com.lightning.school.mvc.util.Closures;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.created;
@@ -38,14 +39,12 @@ public class CoursController {
     private CoursRepository coursRepository;
     private MediaStoreService mediaStoreService;
     private ExerciceRepository exerciceRepository;
-    private SectionRepository sectionRepository;
 
     @Autowired
-    public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository, SectionRepository sectionRepository) {
+    public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository) {
         this.coursRepository = coursRepository;
         this.mediaStoreService = mediaStoreService;
         this.exerciceRepository = exerciceRepository;
-        this.sectionRepository = sectionRepository;
     }
 
     @GetMapping
@@ -129,10 +128,9 @@ public class CoursController {
 
         Cours cours = coursRepository.findById(in.getCoursId()).get();
         Exercice exo = new Exercice(in);
-        //TODO Neo4J exo put
 
         if (CollectionUtils.isEmpty(cours.getExercices())){
-            cours.setExercices(new ArrayList<Exercice>(Arrays.asList(exo)));
+            cours.setExercices(new ArrayList<>(Collections.singleton(exo)));
         } else {
             cours.getExercices().add(exo);
         }
@@ -146,36 +144,29 @@ public class CoursController {
     @PostMapping("/exercices/edit")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity updateExercice(@RequestBody ExerciceIn in, UriComponentsBuilder uriBuilder){
+        Integer exoId = Closures.opt(in::getExerciceId).orElseThrow(CrudException::new);
 
-        if (in.getExerciceId() == null ){
-            throw new CrudException();
-        }
-
-        AtomicReference<Exercice> exo = new AtomicReference<>();
-        AtomicReference<Cours> cours = new AtomicReference<>();
-        coursRepository.findAll().forEach( c->{
-            c.getExercices().forEach( ex -> {
-                if (ex.getExerciceId().equals(in.getExerciceId())){
-                    cours.set(c);
-                    exo.set(ex);
-                    return;
-                }
-            });
-        });
+        Exercice exercice = exerciceRepository.findById(exoId).orElseThrow(() -> new NoDataException(exoId));
 
         if (!StringUtils.isEmpty(in.getExerciceLabel()))
-            exo.get().setExerciceLabel(in.getExerciceLabel());
+            exercice.setExerciceLabel(in.getExerciceLabel());
 
         if (in.getCoeficient() != null &&  in.getCoeficient() > 0f){
-            exo.get().setCoeficient(in.getCoeficient());
+            exercice.setCoeficient(in.getCoeficient());
         }
 
-        cours.set(coursRepository.save(cours.get()));
+        exercice = exerciceRepository.save(exercice);
 
-        URI uri = uriBuilder.path("/api/cours/id/{coursId}").buildAndExpand(cours.get().getCoursId()).toUri();
+        URI uri = uriBuilder.path("/api/exercices/{exoId}").buildAndExpand(exercice.getExerciceId()).toUri();
         return created(uri).build();
     }
 
+    @GetMapping("/exercices/{exoId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Exercice getExerciceById(@PathVariable("exoId") Integer pExoId){
+        Integer exoId = Closures.opt(() -> pExoId).orElseThrow(CrudException::new);
+        return exerciceRepository.findById(exoId).orElseThrow(() -> new NoDataException(exoId));
+    }
 
     private Media createMedia(MultipartFile file){
         String url = mediaStoreService.putMedia(file);
