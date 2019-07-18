@@ -28,7 +28,7 @@ public class Cours implements Serializable {
     @Column(name = "link_cours")
     private String linkCours;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
 
     @OneToMany(cascade = CascadeType.ALL)

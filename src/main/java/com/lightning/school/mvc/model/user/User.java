@@ -37,11 +37,8 @@ public class User implements Serializable {
     @Column(name = "PHOTO_PATH")
     private String userPhoto;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Section> sections;
-
-//    @ManyToMany
-//    List<Group> groups;
 
     public User(String email, String password, Integer typeUserId){
         this.password = password;
@@ -56,6 +53,7 @@ public class User implements Serializable {
         this.name = item.getName();
         this.surname = item.getSurmane();
         this.userPhoto = item.getUserPhoto();
+        this.sections = item.getPromotions();
     }
 
     @JsonIgnore
