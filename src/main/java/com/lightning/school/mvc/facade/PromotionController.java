@@ -70,7 +70,7 @@ public class PromotionController {
         return created(uri).build();
     }
 
-    @PostMapping("/edit")
+    @PutMapping("/edit")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity updateSection(@RequestBody SectionUpdateIn sectionUpdateIn, UriComponentsBuilder uriBuilder) {
 

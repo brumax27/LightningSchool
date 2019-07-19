@@ -79,7 +79,7 @@ public class UserController {
         return created(uri).build();
     }
 
-    @PostMapping("/{userId}/edit")
+    @PutMapping("/{userId}/edit")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Modifie l'utilisateur")
     public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
@@ -129,7 +129,7 @@ public class UserController {
         return created(uri).build();
     }
 
-    @PostMapping("/{userId}/delete")
+    @DeleteMapping("/{userId}/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation("Supprime un utilisateur")
     public ResponseEntity delete(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer pUserId){
