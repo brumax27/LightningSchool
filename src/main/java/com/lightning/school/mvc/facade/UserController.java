@@ -76,7 +76,7 @@ public class UserController {
         User userFinded = new User(user.getMail(), bCryptPasswordEncoder.encode(user.getPassword()), UserTypeEnum.retrieveValueByUserType(typeUser));
         UserItem userItem  = userRepository.save(userFinded);
         URI uri = uriBuilder.path("/api/users/id/{userId}").buildAndExpand(userItem.getId()).toUri();
-        return created(uri).build();
+        return created(uri).body(userItem);
     }
 
     @PutMapping("/{userId}/edit")
