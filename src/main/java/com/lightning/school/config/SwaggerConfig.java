@@ -40,8 +40,8 @@ public class SwaggerConfig {
                                 // gestion 500
                                 new ResponseMessageBuilder()
                                         .code(500)
-                                        .message("500 message")
-                                        .responseModel(new ModelRef("Error"))
+                                        .message("500 error server")
+                                        .responseModel(new ModelRef("errorDto"))
                                         .build(),
                                 // gestion 403
                                 new ResponseMessageBuilder()
