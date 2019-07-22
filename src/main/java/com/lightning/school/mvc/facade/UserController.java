@@ -170,7 +170,7 @@ public class UserController {
 
     private Section findSectionByUSer(User user){
         List<Section> sections = sectionRepository.findAll();
-        AtomicReference<Section> sectionFinded = null;
+        AtomicReference<Section> sectionFinded = new AtomicReference<>();
         sections.forEach(section -> {
             List<User> users = section.getUsers();
             for (User user1 : users) {
