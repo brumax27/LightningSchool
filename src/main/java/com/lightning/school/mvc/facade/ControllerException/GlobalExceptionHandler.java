@@ -57,4 +57,9 @@ public class GlobalExceptionHandler {
         return badRequest().body(new ErrorDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(BadUserException.class)
+    public ResponseEntity handleException(BadUserException ex) {
+        return badRequest().body(new ErrorDto(ex.getMessage()));
+    }
+
 }

@@ -5,6 +5,7 @@ import com.lightning.school.mvc.api.in.user.UserUpdateIn;
 import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.delegate.crud.UserCrudServiceImpl;
+import com.lightning.school.mvc.facade.ControllerException.BadUserException;
 import com.lightning.school.mvc.facade.ControllerException.CrudException;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.facade.ControllerException.UserExistedException;
@@ -65,26 +66,25 @@ public class UserController {
     @GetMapping("/id/{userId}/cours")
     @ApiOperation("Liste les cours d'un utilisateur")
     public List<Cours> getCours(@PathVariable("userId") Integer userId){
-        List<Cours> cours = new ArrayList<>();
         User user = Closures.opt(() -> userRepository.getByIdUser(userId)).orElseThrow(CrudException::new);
         if (UserTypeEnum.TEACHER.equals(user.getUserType())){
+            List<Cours> cours = new ArrayList<>();
             List<Section> sections = user.getSections();
             sections.forEach(section -> {
                 cours.addAll(section.getCours());
             });
             return cours;
         }
+        return findSectionByUSer(user).getCours();
+    }
 
-        List<Section> sections = sectionRepository.findAll();
-        AtomicReference<Section> sectionFinded = null;
-        sections.forEach(section -> {
-            List<User> users = section.getUsers();
-            for (User user1 : users) {
-                if (user.getUserId().equals(user1.getUserId()))
-                    sectionFinded.set(section);
-            }
-        });
-        return sectionFinded.get().getCours();
+    @GetMapping("/id/{userId}/promo")
+    @ApiOperation("recupere la promotion d'un student")
+    public Section getSectionByIdStudent(@PathVariable("userId") Integer userId){
+        User user = Closures.opt(() -> userRepository.getByIdUser(userId)).orElseThrow(CrudException::new);
+        if (!UserTypeEnum.STUDENT.equals(user.getUserType()))
+            throw new BadUserException();
+        return findSectionByUSer(user);
     }
 
     @PostMapping
@@ -166,6 +166,19 @@ public class UserController {
         Integer userId = Closures.opt(() -> pUserId).orElseThrow(CrudException::new);
         userRepository.deleteUser(userId);
         return ResponseEntity.ok().build();
+    }
+
+    private Section findSectionByUSer(User user){
+        List<Section> sections = sectionRepository.findAll();
+        AtomicReference<Section> sectionFinded = null;
+        sections.forEach(section -> {
+            List<User> users = section.getUsers();
+            for (User user1 : users) {
+                if (user.getUserId().equals(user1.getUserId()))
+                    sectionFinded.set(section);
+            }
+        });
+        return sectionFinded.get();
     }
 
 }
