@@ -8,14 +8,16 @@ import com.lightning.school.mvc.delegate.crud.UserCrudServiceImpl;
 import com.lightning.school.mvc.facade.ControllerException.CrudException;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.facade.ControllerException.UserExistedException;
+import com.lightning.school.mvc.model.Cours;
+import com.lightning.school.mvc.model.Section;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
+import com.lightning.school.mvc.repository.mysql.SectionRepository;
 import com.lightning.school.mvc.util.Closures;
 import com.lightning.school.mvc.util.PasswordUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,7 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.http.ResponseEntity.created;
 
@@ -37,12 +41,13 @@ public class UserController {
     private UserCrudServiceImpl userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private MediaStoreService mediaStoreService;
+    private SectionRepository sectionRepository;
 
-    @Autowired
-    public UserController(UserCrudServiceImpl userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, MediaStoreService mediaStoreService) {
+    public UserController(UserCrudServiceImpl userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, MediaStoreService mediaStoreService, SectionRepository sectionRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.mediaStoreService = mediaStoreService;
+        this.sectionRepository = sectionRepository;
     }
 
     @GetMapping
@@ -55,6 +60,31 @@ public class UserController {
     @ApiOperation("Obtien le detail utilisateur")
     public User getUserById(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId){
         return userRepository.getByIdUser(userId);
+    }
+
+    @GetMapping("/id/{userId}/cours")
+    @ApiOperation("Liste les cours d'un utilisateur")
+    public List<Cours> getCours(@PathVariable("userId") Integer userId){
+        List<Cours> cours = new ArrayList<>();
+        User user = Closures.opt(() -> userRepository.getByIdUser(userId)).orElseThrow(CrudException::new);
+        if (UserTypeEnum.TEACHER.equals(user.getUserType())){
+            List<Section> sections = user.getSections();
+            sections.forEach(section -> {
+                cours.addAll(section.getCours());
+            });
+            return cours;
+        }
+
+        List<Section> sections = sectionRepository.findAll();
+        AtomicReference<Section> sectionFinded = null;
+        sections.forEach(section -> {
+            List<User> users = section.getUsers();
+            for (User user1 : users) {
+                if (user.getUserId().equals(user1.getUserId()))
+                    sectionFinded.set(section);
+            }
+        });
+        return sectionFinded.get().getCours();
     }
 
     @PostMapping

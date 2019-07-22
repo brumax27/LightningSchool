@@ -29,9 +29,6 @@ public class Cours implements Serializable {
     private String linkCours;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Section> sections;
-
-    @OneToMany(cascade = CascadeType.ALL)
     List<Exercice> exercices;
 
     @OneToMany(cascade = CascadeType.ALL)

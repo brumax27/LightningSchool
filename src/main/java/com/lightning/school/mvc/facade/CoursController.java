@@ -6,9 +6,11 @@ import com.lightning.school.mvc.facade.ControllerException.CrudException;
 import com.lightning.school.mvc.facade.ControllerException.NoDataException;
 import com.lightning.school.mvc.model.Cours;
 import com.lightning.school.mvc.model.Media;
+import com.lightning.school.mvc.model.Section;
 import com.lightning.school.mvc.model.exercice.Exercice;
 import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
+import com.lightning.school.mvc.repository.mysql.SectionRepository;
 import com.lightning.school.mvc.util.Closures;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -39,13 +41,17 @@ public class CoursController {
     private CoursRepository coursRepository;
     private MediaStoreService mediaStoreService;
     private ExerciceRepository exerciceRepository;
+    private SectionRepository sectionRepository;
 
-    @Autowired
-    public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository) {
+    public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository, SectionRepository sectionRepository) {
         this.coursRepository = coursRepository;
         this.mediaStoreService = mediaStoreService;
         this.exerciceRepository = exerciceRepository;
+        this.sectionRepository = sectionRepository;
     }
+
+    @Autowired
+
 
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -65,6 +71,8 @@ public class CoursController {
                                       @RequestParam("sectionIds") Integer[] sectionIds, @RequestParam("coursLabel") String coursLabel,
                                       @RequestParam("deadline") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate deadline, UriComponentsBuilder uriBuilder){
 
+        List<Section> sections = sectionRepository.findAllById(Arrays.asList(sectionIds));
+
         String urlCours = null;
         List<Media> medias = null;
 
@@ -75,7 +83,13 @@ public class CoursController {
         }
         LocalDateTime dead = LocalDateTime.from(deadline.atTime(LocalTime.now()));
         Cours cours = new Cours(coursLabel, dead, urlCours, medias);
-        cours = coursRepository.save(cours);
+        final Cours finalCours = coursRepository.save(cours);
+        sections.forEach(section -> {
+            List<Cours> coursSections = Closures.opt(section::getCours).orElse(new ArrayList<>());
+            coursSections.add(finalCours);
+            section.setCours(coursSections);
+        });
+        sectionRepository.saveAll(sections);
         URI uri = uriBuilder.path("/api/cours/id/{coursId}").buildAndExpand(cours.getCoursId()).toUri();
         return created(uri).build();
     }
