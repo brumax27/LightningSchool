@@ -12,6 +12,7 @@ import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
 import com.lightning.school.mvc.repository.mysql.SectionRepository;
 import com.lightning.school.mvc.util.Closures;
+import com.lightning.school.mvc.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,14 +43,15 @@ public class CoursController {
     private CoursRepository coursRepository;
     private MediaStoreService mediaStoreService;
     private ExerciceRepository exerciceRepository;
+    private SectionRepository sectionRepository;
 
+    @Autowired
     public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository, SectionRepository sectionRepository) {
         this.coursRepository = coursRepository;
         this.mediaStoreService = mediaStoreService;
         this.exerciceRepository = exerciceRepository;
+        this.sectionRepository = sectionRepository;
     }
-
-    @Autowired
 
 
     @GetMapping
