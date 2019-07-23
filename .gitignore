@@ -24,3 +24,7 @@
 /nbdist/
 /.nb-gradle/
 /build/
+
+tmp/
+
+LightningSchool\.zip
