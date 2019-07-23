@@ -5,12 +5,12 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.lightning.school.config.security.SecurityDataConfig;
 import com.lightning.school.mvc.api.in.user.UserLoginIn;
 import com.lightning.school.mvc.api.in.user.UserRecoveryIn;
+import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.api.out.UserLoginOut;
 import com.lightning.school.mvc.delegate.mail.MailSender;
 import com.lightning.school.mvc.delegate.mail.MailTypeEnum;
 import com.lightning.school.mvc.facade.ControllerException.*;
 import com.lightning.school.mvc.model.user.User;
-import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.Closures;
 import com.lightning.school.mvc.util.PasswordUtil;
@@ -23,6 +23,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import static org.springframework.http.ResponseEntity.accepted;
@@ -53,9 +54,6 @@ public class AuthController {
             throw new UserNotFoundException(in.getMail());
         }
 
-        if (UserTypeEnum.ADMIN.equals(userFinded.getUserType()))
-            throw new AuthException();
-
         boolean auth = bCryptPasswordEncoder.matches(in.getPassword(), userFinded.getPassword());
 
         if (!auth)
@@ -63,13 +61,15 @@ public class AuthController {
 
         String token = JWT.create()
                 .withSubject(userFinded.toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + securityDataConfig.getExpirationTime()))
                 .sign(Algorithm.HMAC512(securityDataConfig.getSecret().getBytes()));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(securityDataConfig.getHeaderString(), securityDataConfig.getTokenPrefix() + token);
         headers.add("Access-Control-Expose-Headers", securityDataConfig.getHeaderString());
         headers.add("Content-Security-Policy", "default-src 'self'; img-src https://*; child-src 'none';");
-        return accepted().headers(headers).build();
+
+        return accepted().headers(headers).body(new UserItem(userFinded));
     }
 
     @GetMapping("/recovery/set-new-password")

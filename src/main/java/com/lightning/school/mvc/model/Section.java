@@ -26,10 +26,10 @@ public class Section implements Serializable {
     @Column(name = "YEAR_PROMOTION")
     private Integer promotionYear;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<User> users;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Cours> cours;
 
     public Section(SectionCreateIn in) {

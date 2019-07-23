@@ -1,1 +1,0 @@
-Alter table lightning_school.cours ADD link_cours varchar(255);

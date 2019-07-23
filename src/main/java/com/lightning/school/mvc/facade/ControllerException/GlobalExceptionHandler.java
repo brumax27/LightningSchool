@@ -47,4 +47,19 @@ public class GlobalExceptionHandler {
         return badRequest().body(new ErrorDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(UserExistedException.class)
+    public ResponseEntity handleException(UserExistedException ex) {
+        return badRequest().body(new ErrorDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(NoDataException.class)
+    public ResponseEntity handleException(NoDataException ex) {
+        return badRequest().body(new ErrorDto(ex.getMessage()));
+    }
+
+    @ExceptionHandler(BadUserException.class)
+    public ResponseEntity handleException(BadUserException ex) {
+        return badRequest().body(new ErrorDto(ex.getMessage()));
+    }
+
 }

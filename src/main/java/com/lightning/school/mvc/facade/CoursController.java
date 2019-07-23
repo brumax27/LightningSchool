@@ -3,13 +3,15 @@ package com.lightning.school.mvc.facade;
 import com.lightning.school.mvc.api.in.exercie.ExerciceIn;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.facade.ControllerException.CrudException;
+import com.lightning.school.mvc.facade.ControllerException.NoDataException;
 import com.lightning.school.mvc.model.Cours;
 import com.lightning.school.mvc.model.Media;
+import com.lightning.school.mvc.model.Section;
 import com.lightning.school.mvc.model.exercice.Exercice;
 import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
+import com.lightning.school.mvc.repository.mysql.SectionRepository;
 import com.lightning.school.mvc.util.Closures;
-import com.lightning.school.mvc.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,6 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.created;
@@ -41,12 +42,14 @@ public class CoursController {
     private MediaStoreService mediaStoreService;
     private ExerciceRepository exerciceRepository;
 
-    @Autowired
-    public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository) {
+    public CoursController(CoursRepository coursRepository, MediaStoreService mediaStoreService, ExerciceRepository exerciceRepository, SectionRepository sectionRepository) {
         this.coursRepository = coursRepository;
         this.mediaStoreService = mediaStoreService;
         this.exerciceRepository = exerciceRepository;
     }
+
+    @Autowired
+
 
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -66,6 +69,8 @@ public class CoursController {
                                       @RequestParam("sectionIds") Integer[] sectionIds, @RequestParam("coursLabel") String coursLabel,
                                       @RequestParam("deadline") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate deadline, UriComponentsBuilder uriBuilder){
 
+        List<Section> sections = sectionRepository.findAllById(Arrays.asList(sectionIds));
+
         String urlCours = null;
         List<Media> medias = null;
 
@@ -76,8 +81,14 @@ public class CoursController {
         }
         LocalDateTime dead = LocalDateTime.from(deadline.atTime(LocalTime.now()));
         Cours cours = new Cours(coursLabel, dead, urlCours, medias);
-        cours = coursRepository.save(cours);
-        URI uri = uriBuilder.path(URL_DETAILS_COURS_BY_ID).buildAndExpand(cours.getCoursId()).toUri();
+        final Cours finalCours = coursRepository.save(cours);
+        sections.forEach(section -> {
+            List<Cours> coursSections = Closures.opt(section::getCours).orElse(new ArrayList<>());
+            coursSections.add(finalCours);
+            section.setCours(coursSections);
+        });
+        sectionRepository.saveAll(sections);
+        URI uri = uriBuilder.path("/api/cours/id/{coursId}").buildAndExpand(cours.getCoursId()).toUri();
         return created(uri).build();
     }
 
@@ -128,11 +139,11 @@ public class CoursController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity createExercice(@RequestBody ExerciceIn in, UriComponentsBuilder uriBuilder){
 
-        Cours cours = coursRepository.findById(in.getCoursId()).orElseThrow(CrudException::new);
-        Exercice exo =  new Exercice(in);
+        Cours cours = coursRepository.findById(in.getCoursId()).get();
+        Exercice exo = new Exercice(in);
 
         if (CollectionUtils.isEmpty(cours.getExercices())){
-            cours.setExercices(Collections.singletonList(exo));
+            cours.setExercices(new ArrayList<>(Collections.singleton(exo)));
         } else {
             cours.getExercices().add(exo);
         }
@@ -143,36 +154,32 @@ public class CoursController {
         return created(uri).build();
     }
 
-    @PutMapping("/exercices")
+    @PutMapping("/exercices/edit")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity updateExercice(@RequestBody ExerciceIn in, UriComponentsBuilder uriBuilder){
-
         Integer exoId = Closures.opt(in::getExerciceId).orElseThrow(CrudException::new);
 
-        AtomicReference<Exercice> exo = new AtomicReference<>();
-        AtomicReference<Cours> cours = new AtomicReference<>();
-        coursRepository.findAll().forEach( c->{
-            c.getExercices().forEach( ex -> {
-                if (ex.getExerciceId().equals(exoId)){
-                    cours.set(c);
-                    exo.set(ex);
-                }
-            });
-        });
+        Exercice exercice = exerciceRepository.findById(exoId).orElseThrow(() -> new NoDataException(exoId));
 
         if (!StringUtils.isEmpty(in.getExerciceLabel()))
-            exo.get().setExerciceLabel(in.getExerciceLabel());
+            exercice.setExerciceLabel(in.getExerciceLabel());
 
         if (in.getCoeficient() != null &&  in.getCoeficient() > 0f){
-            exo.get().setCoeficient(in.getCoeficient());
+            exercice.setCoeficient(in.getCoeficient());
         }
 
-        cours.set(coursRepository.save(cours.get()));
+        exercice = exerciceRepository.save(exercice);
 
-        URI uri = uriBuilder.path(URL_DETAILS_COURS_BY_ID).buildAndExpand(cours.get().getCoursId()).toUri();
+        URI uri = uriBuilder.path("/api/exercices/{exoId}").buildAndExpand(exercice.getExerciceId()).toUri();
         return created(uri).build();
     }
 
+    @GetMapping("/exercices/{exoId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Exercice getExerciceById(@PathVariable("exoId") Integer pExoId){
+        Integer exoId = Closures.opt(() -> pExoId).orElseThrow(CrudException::new);
+        return exerciceRepository.findById(exoId).orElseThrow(() -> new NoDataException(exoId));
+    }
 
     private Media createMedia(MultipartFile file){
         String url = mediaStoreService.putMedia(file);
