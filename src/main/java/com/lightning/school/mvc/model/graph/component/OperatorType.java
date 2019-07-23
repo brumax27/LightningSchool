@@ -1,6 +1,9 @@
 package com.lightning.school.mvc.model.graph.component;
 
+import lombok.Getter;
+
 import java.util.Arrays;
+
 
 public enum OperatorType {
 
@@ -21,6 +24,7 @@ public enum OperatorType {
             new VerityMatrixRow(false , null, true)
     )));
 
+    @Getter
     private VerityTableMatrix verity;
 
     OperatorType(VerityTableMatrix verity) {

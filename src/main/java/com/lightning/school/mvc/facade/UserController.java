@@ -5,9 +5,11 @@ import com.lightning.school.mvc.api.in.user.UserUpdateIn;
 import com.lightning.school.mvc.api.out.UserItem;
 import com.lightning.school.mvc.delegate.aws.MediaStoreService;
 import com.lightning.school.mvc.delegate.crud.UserCrudServiceImpl;
+import com.lightning.school.mvc.facade.ControllerException.CrudException;
 import com.lightning.school.mvc.facade.ControllerException.PasswordInvalidException;
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.model.user.UserTypeEnum;
+import com.lightning.school.mvc.util.Closures;
 import com.lightning.school.mvc.util.PasswordUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,7 +53,7 @@ public class UserController {
     @GetMapping("/id/{userId}")
     @ApiOperation("Obtien le detail utilisateur")
     public User getUserById(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId){
-        return userRepository.getByIdUser(userId);
+        return Closures.opt(() -> userRepository.getByIdUser(userId)).orElseThrow(CrudException::new);
     }
 
     @PostMapping
@@ -76,7 +78,7 @@ public class UserController {
     @ApiOperation("Modifie l'utilisateur")
     public ResponseEntity update(@ApiParam("Id de l'utilisateur")@PathVariable("userId") Integer userId, @RequestParam("file") MultipartFile file, @RequestBody UserUpdateIn user, UriComponentsBuilder uriBuilder) {
 
-        User userFinded = userRepository.getByIdUser(userId);
+        User userFinded = Closures.opt( () -> userRepository.getByIdUser(userId)).orElseThrow(CrudException::new);
 
         if (!StringUtils.isEmpty(user.getPassword())) {
             if (!PasswordUtil.passwordIsValid(user.getPassword())) {
