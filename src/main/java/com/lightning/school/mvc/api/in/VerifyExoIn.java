@@ -7,12 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExerciceIn {
+public class VerifyExoIn {
 
-    private Integer exerciceId;
-    private String exerciceLabel;
-    private Float coeficient;
-    private Integer coursId;
     private String npi;
+    private Integer exerciceTeacherId;
 
 }
