@@ -36,5 +36,13 @@ public class Exercice implements Serializable {
         this.exerciceTypeId = ExerciceTypeEnum.TEACHER.getValue();
         this.exerciceLabel = in.getExerciceLabel();
         this.coeficient = in.getCoeficient();
+        this.npi = in.getNpi();
+    }
+
+    public Exercice(Exercice teacher, String npiStudent) {
+        this.exerciceTypeId = ExerciceTypeEnum.STUDENT.getValue();
+        this.exerciceLabel = teacher.getExerciceLabel();
+        this.coeficient = teacher.getCoeficient();
+        this.npi = npiStudent;
     }
 }

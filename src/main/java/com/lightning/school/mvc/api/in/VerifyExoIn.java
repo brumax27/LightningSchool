@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class VerifyExoIn {
 
     private String npi;
+    private Integer studentExerciceId;
+    private Integer studentId;
     private Integer exerciceTeacherId;
 
 }

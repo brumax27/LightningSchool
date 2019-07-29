@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 public class ResultExerciseOut {
 
     private Boolean resultExercice;
+    private Boolean resultExerciceTeacher;
+    private Boolean validationExercise;
 
 }

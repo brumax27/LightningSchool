@@ -8,9 +8,14 @@ import com.lightning.school.mvc.facade.ControllerException.verrify.exo.MissingOp
 import com.lightning.school.mvc.facade.ControllerException.verrify.exo.MissingOperatorException;
 import com.lightning.school.mvc.facade.ControllerException.verrify.exo.NpiEmptyEception;
 import com.lightning.school.mvc.facade.ControllerException.verrify.exo.OperatorNotSupportedException;
+import com.lightning.school.mvc.model.UserExercice;
 import com.lightning.school.mvc.model.exercice.Exercice;
 import com.lightning.school.mvc.model.exercice.ExerciceTypeEnum;
+import com.lightning.school.mvc.model.user.User;
+import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
+import com.lightning.school.mvc.repository.mysql.UserExerciceRepository;
+import com.lightning.school.mvc.repository.mysql.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,21 +31,43 @@ import java.util.Stack;
 public class ExerciseVerifyController {
 
     private ExerciceRepository exerciceRepository;
+    private UserRepository userRepository;
+    private UserExerciceRepository userExerciceRepository;
 
-    public ExerciseVerifyController(ExerciceRepository exerciceRepository) {
+    public ExerciseVerifyController(ExerciceRepository exerciceRepository, UserRepository userRepository, UserExerciceRepository userExerciceRepository) {
         this.exerciceRepository = exerciceRepository;
+        this.userRepository = userRepository;
+        this.userExerciceRepository = userExerciceRepository;
     }
 
     @PostMapping
     public ResponseEntity<ResultExerciseOut> verifyExercise(@RequestBody VerifyExoIn in){
 
+        User studentUser = userRepository.findById(in.getStudentId()).orElseThrow(CrudException::new);
         Exercice exo = exerciceRepository.findById(in.getExerciceTeacherId()).orElseThrow(CrudException::new);
 
-        if (!ExerciceTypeEnum.TEACHER.equals(exo.getExerciceType())){
-            throw new NoDataException(in.getExerciceTeacherId());
-        }
+        if (!UserTypeEnum.STUDENT.equals(studentUser.getUserType()))
+            throw new NoDataException(in.getStudentId());
 
-        return ResponseEntity.ok(new ResultExerciseOut(verifExo(exo.getNpi()) && verifExo(in.getNpi())));
+        if (!ExerciceTypeEnum.TEACHER.equals(exo.getExerciceType()))
+            throw new NoDataException(in.getExerciceTeacherId());
+
+        boolean student = verifExo(in.getNpi());
+        boolean teacher = verifExo(exo.getNpi());
+
+        UserExercice userExercice = userExerciceRepository.findById(in.getStudentExerciceId()).orElse(new UserExercice());
+
+        if (in.getStudentExerciceId() == null || in.getStudentExerciceId() == 0)
+            userExercice.setUser(studentUser);
+
+        if (student == teacher)
+            userExercice.setExercice(new Exercice(exo, in.getNpi()));
+
+        userExercice.setPathExerciceRender(in.getNpi());
+
+        userExerciceRepository.save(userExercice);
+
+        return ResponseEntity.ok(new ResultExerciseOut(student, teacher, student == teacher));
     }
 
     public Boolean verifExo(String npi){
