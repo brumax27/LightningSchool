@@ -19,7 +19,7 @@ public class MailSender {
 
     private String TO;
     private String SUBJECT;
-    private Map<String, String> PROPERTIES;
+    private Map<String, Object> PROPERTIES;
     private String TEMPLATE_CONTENT;
 
     private MailSender(JavaMailSender emailSender) {
@@ -57,8 +57,13 @@ public class MailSender {
         return this;
     }
 
-    public MailSender appendProperties(Map<String, String> properties){
+    public MailSender appendProperties(Map<String, Object> properties){
         this.PROPERTIES = properties;
+        this.PROPERTIES.put("{subject}", this.SUBJECT);
+        this.PROPERTIES.put("{{site}}","Lightning-School");
+        this.PROPERTIES.entrySet().stream().forEach((entry) -> {
+            this.TEMPLATE_CONTENT = this.TEMPLATE_CONTENT.replace( entry.getKey(), entry.getValue().toString());
+        });
         return this;
     }
 

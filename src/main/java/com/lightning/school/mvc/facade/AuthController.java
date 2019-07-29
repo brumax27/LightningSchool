@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.accepted;
 
@@ -106,13 +107,25 @@ public class AuthController {
             throw new UserNotFoundException();
         }
 
+        Map<String, Object> props = new HashMap<>();
+
+        String token = JWT.create()
+                .withSubject(userFinded.getUserId().toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 3_600_000))
+                .sign(Algorithm.HMAC512(securityDataConfig.getSecret()));
+
+        props.put("{link_recovery}", "/recovery?token="+token);
+        props.put("{name}", userFinded.getName());
+        props.put("{surname}", userFinded.getSurname());
+        props.put("{email}", userFinded.getMail());
+
         MailTypeEnum mailType = MailTypeEnum.RECOVERY;
         try {
             MailSender.buildMail(javaMailSender)
                     .loadTemplate(mailType.getTemplate())
                     .appendTo(userFinded.getMail())
                     .appendSubject(mailType.getSubject())
-                    .appendProperties(new HashMap<>())
+                    .appendProperties(props)
                     .send();
         } catch (MailException ex) {
             throw new MailCustomException();
