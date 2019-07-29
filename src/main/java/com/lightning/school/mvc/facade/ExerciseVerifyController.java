@@ -22,7 +22,7 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 @RestController
-@RequestMapping("/api/verify/exercice")
+@RequestMapping("/api/verify/exercise")
 public class ExerciseVerifyController {
 
     private ExerciceRepository exerciceRepository;
@@ -54,15 +54,21 @@ public class ExerciseVerifyController {
                 stack.push(c - '0' == 1);
             else {
                 try {
+
+                    Boolean left = stack.pop();
+                    Boolean right = null;
+                    if (stack.size() != 0)
+                        right = stack.pop();
+
                     switch (c) {
                         case '&':
-                            stack.push(stack.pop() && stack.pop());
+                            stack.push( left && right);
                             break;
                         case '|':
-                            stack.push(stack.pop() || stack.pop());
+                            stack.push(left || right);
                             break;
                         case '!':
-                            stack.push(!stack.pop());
+                            stack.push(!left);
                             break;
                         default:
                             throw new OperatorNotSupportedException(c);
