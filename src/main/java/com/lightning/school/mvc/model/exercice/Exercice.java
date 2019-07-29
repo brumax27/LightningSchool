@@ -24,7 +24,7 @@ public class Exercice implements Serializable {
     @Column(name = "LIBELLE_EXERCICE")
     private String exerciceLabel;
     @Column(name = "PATH")
-    private String exercicePath;
+    private String npi;
     @Column(name = "COEFFICIENT")
     private Float coeficient;
 

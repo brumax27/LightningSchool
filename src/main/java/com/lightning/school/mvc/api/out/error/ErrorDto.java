@@ -10,4 +10,6 @@ public class ErrorDto {
 
     @Getter
     private String message;
+    @Getter
+    private Integer code;
 }
