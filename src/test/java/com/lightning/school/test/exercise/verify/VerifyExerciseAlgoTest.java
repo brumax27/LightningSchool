@@ -15,7 +15,7 @@ public class VerifyExerciseAlgoTest {
 
     @Before
     public void init(){
-        controller = new ExerciseVerifyController(null);
+        controller = new ExerciseVerifyController(null, null,null);
     }
 
 

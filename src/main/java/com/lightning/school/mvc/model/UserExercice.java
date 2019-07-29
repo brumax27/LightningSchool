@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -19,13 +20,16 @@ public class UserExercice implements Serializable {
     @Id
     @GeneratedValue
     private Integer id;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Exercice exercice;
-    @OneToOne
-    private User User;
+    @OneToOne(cascade = CascadeType.ALL)
+    private User user;
     @Column(name = "PATH_RENDU")
     private String pathExerciceRender;
     @Column(name = "MARK")
     private Float mark;
-
+    @Column
+    private Integer trying = 0;
+    @Column(name = "validate_at")
+    private LocalDateTime validateAt;
 }

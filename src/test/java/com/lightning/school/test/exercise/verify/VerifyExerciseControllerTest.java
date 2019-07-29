@@ -54,7 +54,7 @@ public class VerifyExerciseControllerTest {
 
     @Test
     public void controllerTest(){
-        VerifyExoIn in = new VerifyExoIn("1!10|&", 5);
+        VerifyExoIn in = new VerifyExoIn("1!10|&", null, 3,5);
 
         ResultExerciseOut resultExerciseOut = given().log().all().contentType(ContentType.JSON).header(AUTHORIZATION_HEADER, token)
                 .body(in).when().post("/api/verify/exercise").then().log().all().statusCode(200).extract().as(ResultExerciseOut.class);

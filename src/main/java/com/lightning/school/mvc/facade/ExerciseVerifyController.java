@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
@@ -55,17 +56,23 @@ public class ExerciseVerifyController {
         boolean student = verifExo(in.getNpi());
         boolean teacher = verifExo(exo.getNpi());
 
-        UserExercice userExercice = userExerciceRepository.findById(in.getStudentExerciceId()).orElse(new UserExercice());
+        UserExercice userExercice = new UserExercice();
+        if (in.getStudentExerciceId() != null)
+            userExercice = userExerciceRepository.findById(in.getStudentExerciceId()).get();
+
+        userExercice.setTrying(userExercice.getTrying() + 1);
 
         if (in.getStudentExerciceId() == null || in.getStudentExerciceId() == 0)
             userExercice.setUser(studentUser);
 
-        if (student == teacher)
+        if (student == teacher) {
             userExercice.setExercice(new Exercice(exo, in.getNpi()));
+            userExercice.setValidateAt(LocalDateTime.now());
+        }
 
         userExercice.setPathExerciceRender(in.getNpi());
 
-        userExerciceRepository.save(userExercice);
+        userExercice = userExerciceRepository.save(userExercice);
 
         return ResponseEntity.ok(new ResultExerciseOut(student, teacher, student == teacher));
     }
