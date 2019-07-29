@@ -16,6 +16,8 @@ import com.lightning.school.mvc.model.user.UserTypeEnum;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
 import com.lightning.school.mvc.repository.mysql.UserExerciceRepository;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,7 @@ import java.util.Stack;
 
 @RestController
 @RequestMapping("/api/verify/exercise")
+@Api(description = "Système de vérification d'un exercice")
 public class ExerciseVerifyController {
 
     private ExerciceRepository exerciceRepository;
@@ -42,6 +45,7 @@ public class ExerciseVerifyController {
     }
 
     @PostMapping
+    @ApiOperation("verify un exercice")
     public ResponseEntity<ResultExerciseOut> verifyExercise(@RequestBody VerifyExoIn in){
 
         User studentUser = userRepository.findById(in.getStudentId()).orElseThrow(CrudException::new);

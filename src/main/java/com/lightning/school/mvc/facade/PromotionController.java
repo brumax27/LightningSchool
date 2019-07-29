@@ -11,6 +11,8 @@ import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.SectionRepository;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.Closures;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import static org.springframework.http.ResponseEntity.created;
 
 @RestController
 @RequestMapping("/api/promo")
+@Api(description = "Système de gestion des promotions")
 public class PromotionController {
 
     private SectionRepository sectionRepository;
@@ -43,18 +46,21 @@ public class PromotionController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation("Liste les promotions")
     public List<Section> getAll(){
         return sectionRepository.findAll();
     }
 
     @GetMapping("/id/{sectionId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation("Récupère la promotion")
     public Section getId(@PathVariable("sectionId") Integer id){
         return sectionRepository.findById(id).get();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Creer la promotion")
     public ResponseEntity createSection(@RequestBody SectionCreateIn sectionIn, UriComponentsBuilder uriBuilder){
         Integer teacherId = Closures.opt(() -> sectionIn.getTeacherId()).orElseThrow(CrudException::new);
         User user = userRepository.findById(teacherId).orElseThrow(() -> new NoDataException(sectionIn.getTeacherId()));
@@ -72,6 +78,7 @@ public class PromotionController {
 
     @PutMapping("/edit")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation("Edite la promotion")
     public ResponseEntity updateSection(@RequestBody SectionUpdateIn sectionUpdateIn, UriComponentsBuilder uriBuilder) {
 
         if (sectionUpdateIn.getId() == null){

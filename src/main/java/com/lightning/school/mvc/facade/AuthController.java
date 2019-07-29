@@ -16,6 +16,8 @@ import com.lightning.school.mvc.facade.ControllerException.UserNotFoundException
 import com.lightning.school.mvc.model.user.User;
 import com.lightning.school.mvc.repository.mysql.UserRepository;
 import com.lightning.school.mvc.util.PasswordUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,7 @@ import static org.springframework.http.ResponseEntity.accepted;
 
 @RestController
 @RequestMapping("/api/auth")
+@Api(description = "Authentification")
 public class AuthController {
 
     private UserRepository userRepository;
@@ -49,6 +52,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation("Sign In User")
     public ResponseEntity loginUser(@RequestBody UserLoginIn in){
 
         User userFinded = userRepository.getUserByMail(in.getMail());
@@ -76,7 +80,8 @@ public class AuthController {
 
     @GetMapping("/recovery/set-new-password")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity recoveryPasssave(UserLoginIn in){
+    @ApiOperation("Recording new password")
+    public ResponseEntity recordNewPassword(@RequestParam UserLoginIn in){
         if (!PasswordUtil.passwordIsValid(in.getPassword())) {
             throw new PasswordInvalidException();
         }
@@ -94,6 +99,7 @@ public class AuthController {
 
     @PostMapping("/recovery")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation("recovery Password")
     public ResponseEntity recoveryPassword(@RequestBody UserRecoveryIn in){
         User userFinded = userRepository.getUserByMail(in.getMail());
         if (userFinded == null ){

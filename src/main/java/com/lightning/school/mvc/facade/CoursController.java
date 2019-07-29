@@ -12,6 +12,9 @@ import com.lightning.school.mvc.repository.mysql.CoursRepository;
 import com.lightning.school.mvc.repository.mysql.ExerciceRepository;
 import com.lightning.school.mvc.repository.mysql.SectionRepository;
 import com.lightning.school.mvc.util.Closures;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,7 @@ import static org.springframework.http.ResponseEntity.created;
 
 @RestController
 @RequestMapping("/api/cours")
+@Api(description = "Gestion des cours et des exercices")
 public class CoursController {
 
     private CoursRepository coursRepository;
@@ -55,18 +59,21 @@ public class CoursController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @ApiOperation("Liste tous les cours")
     private List<Cours> getAll(){
         return coursRepository.findAll();
     }
 
     @GetMapping("/id/{coursId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    private Cours getId(@PathVariable("coursId") Integer id){
-        return coursRepository.findById(id).get();
+    @ApiOperation("Récupère le cours pour l'ID donnée")
+    private Cours getId(@ApiParam("Id du cours")@PathVariable("coursId") Integer id){
+        return coursRepository.findById(id).orElseThrow(CrudException::new);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Création d'un cours")
     public ResponseEntity createCours(@RequestParam(value = "medias", required = false) MultipartFile[] mediasFile, @RequestParam(value = "cours", required = false) MultipartFile coursFile,
                                       @RequestParam("sectionIds") Integer[] sectionIds, @RequestParam("coursLabel") String coursLabel,
                                       @RequestParam("deadline") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate deadline, UriComponentsBuilder uriBuilder){
@@ -96,6 +103,7 @@ public class CoursController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Edition d'un cours")
     public ResponseEntity updateCours(@RequestParam("medias") MultipartFile[] mediasFile, @RequestParam("cours") MultipartFile coursFile,
                                       @RequestParam("coursLabel") String coursLabel, @RequestParam("coursId") Integer coursId, @RequestParam(value = "exoId", required = false) Integer[] exoIds,
                                       UriComponentsBuilder uriBuilder){
@@ -138,6 +146,7 @@ public class CoursController {
 
     @PostMapping("/exercices")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Création d'un exercice")
     public ResponseEntity createExercice(@RequestBody ExerciceIn in, UriComponentsBuilder uriBuilder){
 
         Cours cours = coursRepository.findById(in.getCoursId()).get();
@@ -157,6 +166,7 @@ public class CoursController {
 
     @PutMapping("/exercices/edit")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Editer un exercice")
     public ResponseEntity updateExercice(@RequestBody ExerciceIn in, UriComponentsBuilder uriBuilder){
         Integer exoId = Closures.opt(in::getExerciceId).orElseThrow(CrudException::new);
 
@@ -177,7 +187,8 @@ public class CoursController {
 
     @GetMapping("/exercices/{exoId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Exercice getExerciceById(@PathVariable("exoId") Integer pExoId){
+    @ApiOperation("obtenir l'exercice par son id")
+    public Exercice getExerciceById(@ApiParam("Id de l'exercice") @PathVariable("exoId") Integer pExoId){
         Integer exoId = Closures.opt(() -> pExoId).orElseThrow(CrudException::new);
         return exerciceRepository.findById(exoId).orElseThrow(() -> new NoDataException(exoId));
     }
