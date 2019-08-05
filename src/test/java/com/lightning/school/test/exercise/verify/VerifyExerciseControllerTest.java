@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static io.restassured.RestAssured.given;
@@ -21,13 +20,11 @@ public class VerifyExerciseControllerTest {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
-    @LocalServerPort
-    private int port;
     private String token;
 
     @Before
     public void init() {
-        RestAssured.port = port;
+        RestAssured.port = 443;
         RestAssured.baseURI = "https://localhost";
         connect();
     }
