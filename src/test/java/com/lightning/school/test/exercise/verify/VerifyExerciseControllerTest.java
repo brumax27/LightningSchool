@@ -24,7 +24,7 @@ public class VerifyExerciseControllerTest {
 
     @Before
     public void init() {
-        RestAssured.port = 443;
+        RestAssured.port = 555;
         RestAssured.baseURI = "https://localhost";
         connect();
     }
