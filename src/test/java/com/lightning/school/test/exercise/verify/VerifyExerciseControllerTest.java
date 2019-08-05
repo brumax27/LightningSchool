@@ -26,8 +26,9 @@ public class VerifyExerciseControllerTest {
     private String token;
 
     @Before
-    public void init(){
+    public void init() {
         RestAssured.port = port;
+        RestAssured.baseURI = "https://localhost";
         connect();
     }
 
@@ -37,7 +38,7 @@ public class VerifyExerciseControllerTest {
         dto.setPassword("admin");
 
         String location =
-                given()
+                given().relaxedHTTPSValidation()
                         .log().all()
                         .contentType(ContentType.JSON)
                         .body(dto)
@@ -56,7 +57,7 @@ public class VerifyExerciseControllerTest {
     public void controllerTest(){
         VerifyExoIn in = new VerifyExoIn("1!10|&", null, 3,5);
 
-        ResultExerciseOut resultExerciseOut = given().log().all().contentType(ContentType.JSON).header(AUTHORIZATION_HEADER, token)
+        ResultExerciseOut resultExerciseOut = given().relaxedHTTPSValidation().log().all().contentType(ContentType.JSON).header(AUTHORIZATION_HEADER, token)
                 .body(in).when().post("/api/verify/exercise").then().log().all().statusCode(200).extract().as(ResultExerciseOut.class);
 
         Assert.assertFalse(resultExerciseOut.getResultExercice());
